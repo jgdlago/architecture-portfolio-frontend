@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar color="green-lighten-2" density="prominent">
+  <v-app-bar density="prominent" color="">
     <v-container class="d-flex justify-center align-center">
       <div class="text-center flex-grow-1">
         <MenuItem text="Experiências" to="experience" />
@@ -27,15 +27,19 @@ function toggleTheme() {
 </script>
 
 <style scoped>
-.theme-icon {
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
-  color: whitesmoke;
-  font-size: 32px;
-}
+  .container {
+    background: linear-gradient(135deg, #AED581, #DCEDC8);
+  }
 
-.theme-icon:hover {
-  opacity: 1;
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
+  .theme-icon {
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    color: whitesmoke;
+    font-size: 32px;
+  }
+
+  .theme-icon:hover {
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
 </style>

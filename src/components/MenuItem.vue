@@ -2,7 +2,7 @@
   <v-btn 
     :to="to"
     variant="plain"
-    color="brown-darken-1"
+    color="brown-lighten-2"
     class="cursor-pointer"
     >
     {{ text }}
