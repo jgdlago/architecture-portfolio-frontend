@@ -2,3 +2,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --background: #F5F5F5;
+    --primary-text: #6D4C41;
+    --contrast-gold: #F5C67C;
+    --contrast-brown: #8E735B;
+    --accent: #9E8B74;
+}
+
+.dark {
+    --background: #121212;
+    --primary-text: #E0E0E0;
+    --contrast-gold: #8B6D3B;
+    --contrast-brown: #5D3A1E;
+    --accent: #BCAAA4;
+}

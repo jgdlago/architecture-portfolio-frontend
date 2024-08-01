@@ -4,8 +4,17 @@ export default {
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
+  darkMode: 'selector',
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        background: 'var(--background)',
+        primaryText: 'var(--primary-text)',
+        contrastGold: 'var(--contrast-gold)',
+        contrastBrown: 'var(--contrast-brown)',
+        accent: 'var(--accent)',
+      },
+    },
   },
   plugins: [],
 }
