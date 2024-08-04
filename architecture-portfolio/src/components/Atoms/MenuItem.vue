@@ -10,7 +10,7 @@ const props = defineProps<Props>();
 <template>
 
   <span class="px-12">
-    <a href="{{ url }}" class="text-xl text-primaryText hover:text-accent">
+    <a href="{{ url }}" class="text-xl text-primaryText hover:text-contrastGold">
       {{ props.text }}
     </a>
   </span>
