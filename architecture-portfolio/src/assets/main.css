@@ -4,17 +4,17 @@
 @tailwind utilities;
 
 :root {
-    --background: #F5F5F5;
-    --primary-text: #6D4C41;
-    --contrast-gold: #F5C67C;
-    --contrast-brown: #8E735B;
-    --accent: #9E8B74;
+    --background: #ECECEC; /* Cinza claro */
+    --primary-text: #333333; /* Cinza escuro */
+    --contrast-gold: #B4A078; /* Ouro suave */
+    --contrast-brown: #8C857A; /* Marrom acinzentado */
+    --accent: #6C7883; /* Azul acinzentado */
 }
 
 .dark {
-    --background: #121212;
-    --primary-text: #E0E0E0;
-    --contrast-gold: #8B6D3B;
-    --contrast-brown: #5D3A1E;
-    --accent: #BCAAA4;
+    --background: #1A1A1A; /* Cinza muito escuro */
+    --primary-text: #FFFFFF; /* Branco */
+    --contrast-gold: #A0895F; /* Ouro envelhecido */
+    --contrast-brown: #6B6354; /* Marrom escuro */
+    --accent: #5A6978; /* Azul acinzentado escuro */
 }
