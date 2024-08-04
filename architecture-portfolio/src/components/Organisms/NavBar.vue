@@ -15,9 +15,11 @@ const isDark = useDark();
       <MenuItem text="Contato" url="#" />
     </div>
 
-
     <div class="absolute top-4 right-4">
-      <input type="checkbox" v-model="isDark" />
+      <span class="material-symbols-outlined cursor-pointer select-none text-primaryText hover:text-accent"
+          @click="isDark = !isDark">
+        lightbulb
+      </span>
     </div>
   </div>
 </template>
