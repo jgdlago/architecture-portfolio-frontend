@@ -6,7 +6,7 @@ const isDark = useDark();
 </script>
 
 <template>
-  <div class="w-11/12 mx-auto bg-background py-4 rounded-md relative mt-1">
+  <div class="w-full mx-auto bg-background py-4 rounded-md relative mt-1">
 
     <div class="flex justify-center items-center space-x-4">
       <MenuItem text="Experiências" url="#" />

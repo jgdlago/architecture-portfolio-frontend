@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import NavBar from "@/components/Organisms/NavBar.vue";
-import MainBanner from "@/components/Organisms/MainBanner.vue";
+import HeaderSlideShow from "@/components/Molecules/HeaderSlideShow.vue";
+
 </script>
 
 <template>
   <NavBar />
-  <MainBanner />
+  <HeaderSlideShow />
+
   <RouterView />
 </template>
 
