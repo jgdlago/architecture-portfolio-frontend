@@ -18,3 +18,7 @@
     --contrast-brown: #6B6354; /* Marrom escuro */
     --accent: #5A6978; /* Azul acinzentado escuro */
 }
+
+body {
+    background-color: var(--background);
+}
