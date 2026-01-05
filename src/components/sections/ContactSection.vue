@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { EnvelopeIcon } from '@heroicons/vue/24/outline'
-import { ref } from 'vue'
+import { EnvelopeIcon } from '@heroicons/vue/24/outline';
+import { ref } from 'vue';
 
 // Importando SVGs como componentes Vue
-import InstagramIcon from '@/assets/icons/instagram.svg?component'
-import LinkedInIcon from '@/assets/icons/linkedin.svg?component'
+import InstagramIcon from '@/assets/icons/instagram.svg?component';
+import LinkedInIcon from '@/assets/icons/linkedin.svg?component';
+import WhatsAppIcon from '@/assets/icons/whatsapp.svg?component';
 
 interface Form {
   name: string
@@ -60,14 +61,17 @@ const sendEmail = () => {
 
       <!-- Redes sociais -->
         <div class="socials">
-            <a href="https://www.instagram.com/seuusuario" target="_blank" aria-label="Instagram">
+            <a href="https://www.instagram.com/" target="_blank" aria-label="Instagram">
                 <InstagramIcon />
             </a>
-            <a href="https://www.linkedin.com/in/seuusuario" target="_blank" aria-label="LinkedIn">
+            <a href="https://www.linkedin.com/" target="_blank" aria-label="LinkedIn">
                 <LinkedInIcon />
             </a>
             <a href="mailto:email@dominio.com" aria-label="E-mail">
                 <EnvelopeIcon />
+            </a>
+            <a href="#" target="_blank" aria-label="WhatsApp">
+                <WhatsAppIcon />
             </a>
         </div>
 
