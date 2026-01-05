@@ -16,11 +16,15 @@
 
 <style scoped>
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 3rem;
+    background-color: color-mix(
+    in srgb,
+    var(--background) 85%,
+    transparent
+  );
 }
 
 /* Marca */
