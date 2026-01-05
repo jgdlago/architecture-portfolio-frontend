@@ -3,6 +3,7 @@
 import HeroSection from '@/components/home/HeroSection.vue';
 import Navbar from '@/components/layout/Navbar.vue';
 import AboutSection from '@/components/sections/AboutSection.vue';
+import ProcessSection from '../components/sections/ProcessSection.vue';
 </script>
 
 <template>
@@ -10,5 +11,6 @@ import AboutSection from '@/components/sections/AboutSection.vue';
   <HeroSection />
   <FeaturedProjects />
   <AboutSection />
+  <ProcessSection />
 </template>
 
