@@ -11,11 +11,11 @@ const routes = [
         name: 'login',
         component: () => import('@/views/auth/LoginView.vue'),
     },
-    {
-        path: '/register',
-        name: 'register',
-        component: () => import('@/views/auth/RegisterView.vue'),
-    },
+    // {
+    //     path: '/register',
+    //     name: 'register',
+    //     component: () => import('@/views/auth/RegisterView.vue'),
+    // },
 ]
 
 export const router = createRouter({
