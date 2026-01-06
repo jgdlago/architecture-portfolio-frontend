@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { EnvelopeIcon } from '@heroicons/vue/24/outline';
-import { ref } from 'vue';
-
-// Importando SVGs como componentes Vue
 import InstagramIcon from '@/assets/icons/instagram.svg?component';
 import LinkedInIcon from '@/assets/icons/linkedin.svg?component';
 import WhatsAppIcon from '@/assets/icons/whatsapp.svg?component';
+import { EnvelopeIcon } from '@heroicons/vue/24/outline';
+import { ref } from 'vue';
 
 interface Form {
   name: string
@@ -60,20 +58,24 @@ const sendEmail = () => {
       </form>
 
       <!-- Redes sociais -->
-        <div class="socials">
-            <a href="https://www.instagram.com/" target="_blank" aria-label="Instagram">
-                <InstagramIcon />
-            </a>
-            <a href="https://www.linkedin.com/" target="_blank" aria-label="LinkedIn">
-                <LinkedInIcon />
-            </a>
-            <a href="mailto:email@dominio.com" aria-label="E-mail">
-                <EnvelopeIcon />
-            </a>
-            <a href="#" target="_blank" aria-label="WhatsApp">
-                <WhatsAppIcon />
-            </a>
-        </div>
+      <div class="socials">
+        <a href="https://www.instagram.com/" target="_blank" class="social-link" aria-label="Instagram">
+          <InstagramIcon class="icon" />
+          <span class="social-title">Instagram</span>
+        </a>
+        <a href="https://www.linkedin.com/" target="_blank" class="social-link" aria-label="LinkedIn">
+          <LinkedInIcon class="icon" />
+          <span class="social-title">LinkedIn</span>
+        </a>
+        <a href="mailto:email@dominio.com" class="social-link" aria-label="E-mail">
+          <EnvelopeIcon class="icon" />
+          <span class="social-title">E-mail</span>
+        </a>
+        <a href="#" target="_blank" class="social-link" aria-label="WhatsApp">
+          <WhatsAppIcon class="icon" />
+          <span class="social-title">WhatsApp</span>
+        </a>
+      </div>
 
     </div>
   </section>
@@ -113,38 +115,39 @@ const sendEmail = () => {
 /* Redes sociais */
 .socials {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 1.5rem;
-  justify-content: flex-start; /* ou center se preferir */
-  align-items: center;
-  margin-bottom: 2rem;
+  justify-content: flex-start;
 }
 
-.socials a {
-  display: inline-flex;
+.social-link {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;   /* espaço fixo para cada ícone */
-  height: 40px;
+  gap: 0.8rem;
+  text-decoration: none;
+  color: var(--primary-text);
+  transition: transform 0.2s ease;
 }
 
-.socials a svg {
-  width: 24px;
-  height: 24px;
+.social-link .icon {
+  width: 28px;
+  height: 28px;
   color: var(--primary-text);
   transition: color 0.3s ease, transform 0.2s ease;
 }
 
-.socials a:hover svg {
+.social-link:hover .icon,
+.social-link:hover .social-title {
   color: var(--contrast-gold);
   transform: scale(1.1);
 }
 
 .social-title {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--contrast-brown);
+  transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .icons {
