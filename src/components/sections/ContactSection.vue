@@ -31,50 +31,48 @@ const sendEmail = () => {
       <p>Vamos conversar sobre o seu projeto ou tirar dúvidas.</p>
     </header>
 
-    <div class="contact-content">
+    <div class="blocks">
 
       <!-- Formulário -->
-      <form @submit.prevent="sendEmail" class="contact-form">
+      <div class="block form-block">
         <span class="form-title">Envie uma mensagem</span>
-        <input
-          v-model="form.name"
-          type="text"
-          placeholder="Nome"
-          required
-        />
-        <input
-          v-model="form.email"
-          type="email"
-          placeholder="E-mail"
-          required
-        />
-        <textarea
-          v-model="form.message"
-          placeholder="Mensagem"
-          rows="5"
-          required
-        ></textarea>
-        <button type="submit">Enviar</button>
-      </form>
+        <form @submit.prevent="sendEmail" class="contact-form">
+          <input v-model="form.name" type="text" placeholder="Nome" required />
+          <input v-model="form.email" type="email" placeholder="E-mail" required />
+          <textarea v-model="form.message" placeholder="Mensagem" rows="5" required></textarea>
+          <button type="submit">Enviar</button>
+        </form>
+      </div>
 
       <!-- Redes sociais -->
-      <div class="socials">
-        <a href="https://www.instagram.com/" target="_blank" class="social-link" aria-label="Instagram">
-          <InstagramIcon class="icon" />
-          <span class="social-title">Instagram</span>
-        </a>
-        <a href="https://www.linkedin.com/" target="_blank" class="social-link" aria-label="LinkedIn">
-          <LinkedInIcon class="icon" />
-          <span class="social-title">LinkedIn</span>
-        </a>
-        <a href="mailto:email@dominio.com" class="social-link" aria-label="E-mail">
-          <EnvelopeIcon class="icon" />
-          <span class="social-title">E-mail</span>
-        </a>
-        <a href="#" target="_blank" class="social-link" aria-label="WhatsApp">
-          <WhatsAppIcon class="icon" />
-          <span class="social-title">WhatsApp</span>
-        </a>
+      <div class="block socials-block">
+        <h3>Redes sociais</h3>
+        <ul>
+          <li>
+            <a href="https://www.instagram.com/" target="_blank" class="social-link" aria-label="Instagram">
+              <InstagramIcon class="icon" />
+              <span>Instagram</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.linkedin.com/" target="_blank" class="social-link" aria-label="LinkedIn">
+              <LinkedInIcon class="icon" />
+              <span>LinkedIn</span>
+            </a>
+          </li>
+          <li>
+            <a href="mailto:email@dominio.com" class="social-link" aria-label="E-mail">
+              <EnvelopeIcon class="icon" />
+              <span>E-mail</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" target="_blank" class="social-link" aria-label="WhatsApp">
+              <WhatsAppIcon class="icon" />
+              <span>WhatsApp</span>
+            </a>
+          </li>
+        </ul>
       </div>
 
     </div>
@@ -89,87 +87,40 @@ const sendEmail = () => {
 }
 
 .contact header {
-  text-align: left;
+  max-width: 600px;
   margin-bottom: 4rem;
 }
 
 .contact h2 {
-  font-size: 1.8rem;
-  letter-spacing: 0.2em;
+  font-size: 1.5rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
   margin-bottom: 1rem;
 }
 
 .contact p {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--contrast-brown);
+  line-height: 1.8;
 }
 
-/* Conteúdo */
-.contact-content {
-  display: flex;
-  justify-content: space-between;
+/* Grid de blocos */
+.blocks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 4rem;
 }
 
-/* Redes sociais */
-.socials {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  justify-content: flex-start;
-}
-
-.social-link {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  text-decoration: none;
-  color: var(--primary-text);
-  transition: transform 0.2s ease;
-}
-
-.social-link .icon {
-  width: 28px;
-  height: 28px;
-  color: var(--primary-text);
-  transition: color 0.3s ease, transform 0.2s ease;
-}
-
-.social-link:hover .icon,
-.social-link:hover .social-title {
-  color: var(--contrast-gold);
-  transform: scale(1.1);
-}
-
-.social-title {
+/* Formulário */
+.form-block .form-title {
   font-size: 0.95rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--contrast-brown);
-  transition: color 0.3s ease, transform 0.2s ease;
+  margin-bottom: 1rem;
 }
 
-.icons {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.icon {
-  width: 36px;
-  height: 36px;
-  stroke: var(--primary-text);
-  transition: stroke 0.3s ease, transform 0.3s ease;
-}
-
-.icon:hover {
-  stroke: var(--contrast-gold);
-  transform: scale(1.1);
-}
-
-/* Formulário */
 .contact-form {
-  flex: 2;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -177,15 +128,6 @@ const sendEmail = () => {
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-  max-width: 50%;
-}
-
-.form-title {
-  font-size: 0.95rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--contrast-brown);
-  margin-bottom: 1rem;
 }
 
 .contact-form input,
@@ -220,16 +162,56 @@ const sendEmail = () => {
   transform: translateY(-2px);
 }
 
+/* Redes sociais */
+.socials-block h3 {
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.socials-block ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+  color: var(--primary-text);
+  transition: transform 0.2s ease;
+}
+
+.social-link .icon {
+  width: 28px;
+  height: 28px;
+  color: var(--primary-text);
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.social-link:hover .icon,
+.social-link:hover span {
+  color: var(--contrast-gold);
+  transform: scale(1.1);
+}
+
+.socials-block span {
+  font-size: 0.95rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--contrast-brown);
+}
+
 /* Responsivo */
 @media (max-width: 1024px) {
-  .contact-content {
-    flex-direction: column;
-    gap: 3rem;
-  }
-
-  .socials {
-    flex-direction: row;
-    justify-content: center;
+  .blocks {
+    grid-template-columns: 1fr;
   }
 }
 </style>

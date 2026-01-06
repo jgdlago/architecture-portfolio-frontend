@@ -3,6 +3,7 @@
 import HeroSection from '@/components/home/HeroSection.vue';
 import Navbar from '@/components/layout/Navbar.vue';
 import AboutSection from '@/components/sections/AboutSection.vue';
+import Footer from '../components/layout/Footer.vue';
 import ContactSection from '../components/sections/ContactSection.vue';
 import ExperienceSection from '../components/sections/ExperienceSection.vue';
 import ProcessSection from '../components/sections/ProcessSection.vue';
@@ -16,5 +17,6 @@ import ProcessSection from '../components/sections/ProcessSection.vue';
   <ProcessSection />
   <ExperienceSection />
   <ContactSection />
+  <Footer />
 </template>
 
