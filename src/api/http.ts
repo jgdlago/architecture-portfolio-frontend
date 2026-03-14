@@ -20,6 +20,12 @@ export function resolveMediaUrl(path: string | null | undefined): string {
         return path
     }
 
+    const storageUrl = import.meta.env.VITE_STORAGE_URL
+    if (storageUrl) {
+        const normalizedPath = path.startsWith('/') ? path.slice(1) : path
+        return `${String(storageUrl).replace(/\/$/, '')}/${normalizedPath}`
+    }
+
     const apiBaseUrl = String(import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
     const appBaseUrl = apiBaseUrl.replace(/\/api$/i, '')
     const normalizedPath = path.startsWith('/') ? path : `/storage/${path}`
