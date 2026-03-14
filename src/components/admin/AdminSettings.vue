@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { fetchAdminSettings, uploadFile, upsertAdminSetting } from '@/api/admin'
 import { resolveMediaUrl } from '@/api/http'
+import HeroSection from '@/components/home/HeroSection.vue'
+import Footer from '@/components/layout/Footer.vue'
+import AboutSection from '@/components/sections/AboutSection.vue'
+import ContactSection from '@/components/sections/ContactSection.vue'
+import ExperienceSection from '@/components/sections/ExperienceSection.vue'
+import ProcessSection from '@/components/sections/ProcessSection.vue'
 import { useToast } from '@/composables/useToast'
 import { getApiErrorMessage } from '@/utils/apiErrors'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 type SiteSettingItem = {
     id: number
@@ -23,6 +29,7 @@ const process = ref({ title: '', steps: [] as Array<{ title: string; description
 const experience = ref({ title: '', subtitle: '', blocks: [] as Array<{ title: string; items: string[] }> })
 
 const activeSection = ref<'hero' | 'about' | 'contact' | 'footer' | 'process' | 'experience'>('hero')
+const previewTheme = ref<'light' | 'dark'>('light')
 const sectionLabels: Record<typeof activeSection.value, string> = {
     hero: 'Banner Principal',
     about: 'Sobre',
@@ -122,6 +129,8 @@ const uploadHeroImage = async (e: Event) => {
     }
 }
 
+const heroPreviewImage = computed(() => resolveMediaUrl(hero.value.image_path) || '')
+
 onMounted(load)
 </script>
 
@@ -159,6 +168,21 @@ onMounted(load)
                 </label>
             </div>
             <button type="submit" class="btn-save" :disabled="isSaving">Salvar Banner Principal</button>
+
+            <div class="live-preview">
+                <div class="preview-header">
+                    <h3>Preview</h3>
+                    <div class="theme-switch" role="group" aria-label="Tema do preview">
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                    </div>
+                </div>
+                <div class="site-preview-shell">
+                    <div class="site-preview" :class="{ 'preview-dark': previewTheme === 'dark' }">
+                        <HeroSection :title="hero.title || undefined" :subtitle="hero.subtitle || undefined" :background-image="heroPreviewImage" />
+                    </div>
+                </div>
+            </div>
         </form>
 
         <!-- About -->
@@ -179,6 +203,21 @@ onMounted(load)
                 </label>
             </div>
             <button type="submit" class="btn-save" :disabled="isSaving">Salvar Sobre</button>
+
+            <div class="live-preview">
+                <div class="preview-header">
+                    <h3>Preview</h3>
+                    <div class="theme-switch" role="group" aria-label="Tema do preview">
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                    </div>
+                </div>
+                <div class="site-preview-shell">
+                    <div class="site-preview" :class="{ 'preview-dark': previewTheme === 'dark' }">
+                        <AboutSection :text="about.text || undefined" :image="resolveMediaUrl(about.image_path) || undefined" />
+                    </div>
+                </div>
+            </div>
         </form>
 
         <!-- Process -->
@@ -199,6 +238,21 @@ onMounted(load)
                 <button type="button" class="btn-add" @click="addStep">+ Adicionar etapa</button>
             </div>
             <button type="submit" class="btn-save" :disabled="isSaving">Salvar Processo</button>
+
+            <div class="live-preview">
+                <div class="preview-header">
+                    <h3>Preview</h3>
+                    <div class="theme-switch" role="group" aria-label="Tema do preview">
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                    </div>
+                </div>
+                <div class="site-preview-shell">
+                    <div class="site-preview" :class="{ 'preview-dark': previewTheme === 'dark' }">
+                        <ProcessSection :title="process.title || undefined" :steps="process.steps" />
+                    </div>
+                </div>
+            </div>
         </form>
 
         <!-- Experience -->
@@ -229,6 +283,22 @@ onMounted(load)
                 <button type="button" class="btn-add" @click="addBlock">+ Adicionar bloco</button>
             </div>
             <button type="submit" class="btn-save" :disabled="isSaving">Salvar Experiência</button>
+
+            <div class="live-preview">
+                <div class="preview-header">
+                    <h3>Preview</h3>
+                    <div class="theme-switch" role="group" aria-label="Tema do preview">
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                    </div>
+                </div>
+                <div class="site-preview-shell">
+                    <div class="site-preview" :class="{ 'preview-dark': previewTheme === 'dark' }">
+                        <ExperienceSection :title="experience.title || undefined" :subtitle="experience.subtitle || undefined"
+                            :blocks="experience.blocks" />
+                    </div>
+                </div>
+            </div>
         </form>
 
         <!-- Contact -->
@@ -244,6 +314,23 @@ onMounted(load)
                 <div class="field"><label>LinkedIn URL</label><input v-model="contact.linkedin_url" /></div>
             </div>
             <button type="submit" class="btn-save" :disabled="isSaving">Salvar Contato</button>
+
+            <div class="live-preview">
+                <div class="preview-header">
+                    <h3>Preview</h3>
+                    <div class="theme-switch" role="group" aria-label="Tema do preview">
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                    </div>
+                </div>
+                <div class="site-preview-shell">
+                    <div class="site-preview" :class="{ 'preview-dark': previewTheme === 'dark' }">
+                        <ContactSection :title="contact.title || undefined" :description="contact.description || undefined"
+                            :instagram-url="contact.instagram_url || undefined" :linkedin-url="contact.linkedin_url || undefined"
+                            :email="contact.email || undefined" :whatsapp-url="contact.whatsapp_url || undefined" />
+                    </div>
+                </div>
+            </div>
         </form>
 
         <!-- Footer -->
@@ -261,6 +348,24 @@ onMounted(load)
                 <div class="field"><label>CAU</label><input v-model="footer.cau" /></div>
             </div>
             <button type="submit" class="btn-save" :disabled="isSaving">Salvar Footer</button>
+
+            <div class="live-preview">
+                <div class="preview-header">
+                    <h3>Preview</h3>
+                    <div class="theme-switch" role="group" aria-label="Tema do preview">
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                    </div>
+                </div>
+                <div class="site-preview-shell">
+                    <div class="site-preview" :class="{ 'preview-dark': previewTheme === 'dark' }">
+                        <Footer :brand-name="footer.brand_name || undefined" :brand-subtitle="footer.brand_subtitle || undefined"
+                            :email="footer.email || undefined" :phone="footer.phone || undefined" :city="footer.city || undefined"
+                            :instagram-url="footer.instagram_url || undefined" :linkedin-url="footer.linkedin_url || undefined"
+                            :copyright-text="footer.copyright || undefined" :cau="footer.cau || undefined" />
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 </template>
@@ -353,6 +458,123 @@ onMounted(load)
     color: var(--primary-text);
     font-weight: 600;
     cursor: pointer;
+}
+
+.live-preview {
+    margin-top: 1rem;
+    border-top: 1px solid color-mix(in srgb, var(--contrast-brown) 18%, transparent);
+    padding-top: 0.9rem;
+}
+
+.preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-bottom: 0.6rem;
+}
+
+.preview-header h3 {
+    margin: 0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--contrast-gold);
+}
+
+.theme-switch {
+    display: inline-flex;
+    border: 1px solid color-mix(in srgb, var(--contrast-brown) 30%, transparent);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.theme-switch button {
+    border: none;
+    background: transparent;
+    color: var(--contrast-brown);
+    font-size: 0.72rem;
+    padding: 0.3rem 0.65rem;
+    cursor: pointer;
+}
+
+.theme-switch button.active {
+    background: var(--contrast-gold);
+    color: var(--primary-text);
+    font-weight: 700;
+}
+
+.site-preview-shell {
+    border: 1px solid color-mix(in srgb, var(--contrast-brown) 24%, transparent);
+    border-radius: 12px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--background) 96%, black 4%);
+}
+
+.site-preview {
+    --background: #ECECEC;
+    --primary-text: #333333;
+    --contrast-gold: #B4A078;
+    --contrast-brown: #8C857A;
+    --accent: #6C7883;
+    --hero-text: #ffffff;
+    --hero-overlay: rgba(0, 0, 0, 0.55);
+
+    height: 420px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--contrast-brown) 65%, transparent)
+        color-mix(in srgb, var(--background) 88%, black 12%);
+}
+
+.site-preview.preview-dark {
+    --background: #1A1A1A;
+    --primary-text: #FFFFFF;
+    --contrast-gold: #A0895F;
+    --contrast-brown: #6B6354;
+    --accent: #5A6978;
+    --hero-text: #ffffff;
+    --hero-overlay: rgba(0, 0, 0, 0.65);
+}
+
+.site-preview :deep(.hero) {
+    height: 340px;
+}
+
+.site-preview :deep(section) {
+    min-width: 0;
+}
+
+/* WebKit */
+.site-preview::-webkit-scrollbar {
+    width: 10px;
+}
+
+.site-preview::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--background) 88%, black 12%);
+    border-left: 1px solid color-mix(in srgb, var(--contrast-brown) 18%, transparent);
+}
+
+.site-preview::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--contrast-brown) 65%, transparent);
+    border-radius: 999px;
+    border: 2px solid color-mix(in srgb, var(--background) 88%, black 12%);
+}
+
+.site-preview::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--contrast-gold) 62%, var(--contrast-brown) 38%);
+}
+
+.site-preview :deep(a),
+.site-preview :deep(button),
+.site-preview :deep(input),
+.site-preview :deep(textarea) {
+    pointer-events: none;
 }
 
 /* Repeater */
