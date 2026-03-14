@@ -1,36 +1,44 @@
 <template>
   <section class="process">
     <header>
-      <h2>Processo</h2>
+      <h2>{{ title }}</h2>
     </header>
 
     <div class="steps">
-      <div class="step">
-        <span class="index">01</span>
-        <h3>Contexto</h3>
-        <p>
-          Leitura do lugar, da cidade e das relações que o espaço propõe.
-        </p>
-      </div>
-
-      <div class="step">
-        <span class="index">02</span>
-        <h3>Conceito</h3>
-        <p>
-          Tradução das necessidades em uma ideia clara e estruturadora.
-        </p>
-      </div>
-
-      <div class="step">
-        <span class="index">03</span>
-        <h3>Forma</h3>
-        <p>
-          Materialização do conceito em arquitetura precisa e atemporal.
-        </p>
+      <div v-for="(step, index) in steps" :key="`${step.title}-${index}`" class="step">
+        <span class="index">{{ String(index + 1).padStart(2, '0') }}</span>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.description }}</p>
       </div>
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    title?: string
+    steps?: Array<{ title: string; description: string }>
+  }>(),
+  {
+    title: 'Processo',
+    steps: () => [
+      {
+        title: 'Contexto',
+        description: 'Leitura do lugar, da cidade e das relacoes que o espaco propoe.',
+      },
+      {
+        title: 'Conceito',
+        description: 'Traducao das necessidades em uma ideia clara e estruturadora.',
+      },
+      {
+        title: 'Forma',
+        description: 'Materializacao do conceito em arquitetura precisa e atemporal.',
+      },
+    ],
+  },
+)
+</script>
 
 <style scoped>
 .process {

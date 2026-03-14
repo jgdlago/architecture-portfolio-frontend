@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { http } from '@/api/http';
 import InstagramIcon from '@/assets/icons/instagram.svg?component';
 import LinkedInIcon from '@/assets/icons/linkedin.svg?component';
 import WhatsAppIcon from '@/assets/icons/whatsapp.svg?component';
 import { EnvelopeIcon } from '@heroicons/vue/24/outline';
 import { ref } from 'vue';
+import { http } from '../../api/http';
 
 interface Form {
   name: string
@@ -19,6 +19,25 @@ const form = ref<Form>({
 })
 
 const isSubmitting = ref(false)
+
+withDefaults(
+  defineProps<{
+    title?: string
+    description?: string
+    instagramUrl?: string
+    linkedinUrl?: string
+    email?: string
+    whatsappUrl?: string
+  }>(),
+  {
+    title: 'Contato',
+    description: 'Vamos conversar sobre o seu projeto ou tirar duvidas.',
+    instagramUrl: 'https://www.instagram.com/',
+    linkedinUrl: 'https://www.linkedin.com/',
+    email: 'email@dominio.com',
+    whatsappUrl: '#',
+  },
+)
 
 const sendEmail = async () => {
   if (isSubmitting.value) {
@@ -42,8 +61,8 @@ const sendEmail = async () => {
 <template>
   <section class="contact">
     <header>
-      <h2>Contato</h2>
-      <p>Vamos conversar sobre o seu projeto ou tirar dúvidas.</p>
+      <h2>{{ title }}</h2>
+      <p>{{ description }}</p>
     </header>
 
     <div class="blocks">
@@ -66,25 +85,25 @@ const sendEmail = async () => {
         <h3>Redes sociais</h3>
         <ul>
           <li>
-            <a href="https://www.instagram.com/" target="_blank" class="social-link" aria-label="Instagram">
+            <a :href="instagramUrl" target="_blank" class="social-link" aria-label="Instagram">
               <InstagramIcon class="icon" />
               <span>Instagram</span>
             </a>
           </li>
           <li>
-            <a href="https://www.linkedin.com/" target="_blank" class="social-link" aria-label="LinkedIn">
+            <a :href="linkedinUrl" target="_blank" class="social-link" aria-label="LinkedIn">
               <LinkedInIcon class="icon" />
               <span>LinkedIn</span>
             </a>
           </li>
           <li>
-            <a href="mailto:email@dominio.com" class="social-link" aria-label="E-mail">
+            <a :href="`mailto:${email}`" class="social-link" aria-label="E-mail">
               <EnvelopeIcon class="icon" />
               <span>E-mail</span>
             </a>
           </li>
           <li>
-            <a href="#" target="_blank" class="social-link" aria-label="WhatsApp">
+            <a :href="whatsappUrl" target="_blank" class="social-link" aria-label="WhatsApp">
               <WhatsAppIcon class="icon" />
               <span>WhatsApp</span>
             </a>

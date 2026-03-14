@@ -5,6 +5,12 @@ export const http = axios.create({
     withCredentials: true,
 })
 
+const bootToken = localStorage.getItem('portfolio_token')
+
+if (bootToken) {
+    http.defaults.headers.common.Authorization = `Bearer ${bootToken}`
+}
+
 export function resolveMediaUrl(path: string | null | undefined): string {
     if (!path) {
         return ''

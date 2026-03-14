@@ -1,4 +1,13 @@
 :root {
+    --font-family-base: "Inter", "Segoe UI", sans-serif;
+    --font-size-h1: clamp(2.8rem, 6vw, 5rem);
+    --font-size-h2: clamp(1.5rem, 3vw, 2rem);
+    --font-size-h3: 1rem;
+    --font-size-body: 1rem;
+    --line-height-body: 1.7;
+    --section-padding-desktop: 6rem 3rem;
+    --section-padding-mobile: 4rem 1.5rem;
+
     --background: #ECECEC;
     --primary-text: #333333;
     --contrast-gold: #B4A078;

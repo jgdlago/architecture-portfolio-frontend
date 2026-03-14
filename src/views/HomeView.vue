@@ -20,6 +20,9 @@ const aboutText = computed(() => settings.value.about?.text ?? undefined)
 const aboutImage = computed(() => resolveMediaUrl(settings.value.about?.image_path) || undefined)
 
 const footer = computed(() => settings.value.footer ?? {})
+const process = computed(() => settings.value.process ?? {})
+const experience = computed(() => settings.value.experience ?? {})
+const contact = computed(() => settings.value.contact ?? {})
 
 onMounted(async () => {
   try {
@@ -47,11 +50,18 @@ onMounted(async () => {
     <AboutSection :text="aboutText" :image="aboutImage" />
   </div>
 
-  <ProcessSection />
-  <ExperienceSection />
+  <ProcessSection :title="process.title" :steps="process.steps" />
+  <ExperienceSection :title="experience.title" :subtitle="experience.subtitle" :blocks="experience.blocks" />
 
   <div id="contact">
-    <ContactSection />
+    <ContactSection
+      :title="contact.title"
+      :description="contact.description"
+      :instagram-url="contact.instagram_url"
+      :linkedin-url="contact.linkedin_url"
+      :email="contact.email"
+      :whatsapp-url="contact.whatsapp_url"
+    />
   </div>
 
   <Footer

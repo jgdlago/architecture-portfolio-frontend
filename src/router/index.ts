@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/auth'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -10,6 +11,13 @@ const routes = [
         path: '/login',
         name: 'login',
         component: () => import('@/views/auth/LoginView.vue'),
+        meta: { guestOnly: true },
+    },
+    {
+        path: '/admin',
+        name: 'admin',
+        component: () => import('@/views/admin/AdminDashboardView.vue'),
+        meta: { requiresAuth: true },
     },
     {
         path: '/projects',
@@ -49,4 +57,18 @@ export const router = createRouter({
             behavior: 'smooth',
         }
     },
+})
+
+router.beforeEach((to) => {
+    const auth = useAuthStore()
+
+    if (to.meta.requiresAuth && !auth.token) {
+        return { name: 'login', query: { redirect: to.fullPath } }
+    }
+
+    if (to.meta.guestOnly && auth.token) {
+        return { name: 'admin' }
+    }
+
+    return true
 })

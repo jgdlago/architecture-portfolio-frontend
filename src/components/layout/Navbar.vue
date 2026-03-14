@@ -1,9 +1,20 @@
 <script setup lang="ts">
 import { useTheme } from '@/composables/useTheme';
 import { MoonIcon, SunIcon } from '@heroicons/vue/24/outline';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 
 const { isDark, toggle } = useTheme()
+const route = useRoute()
+
+const isSectionActive = (hash: string): boolean => {
+  if (route.path !== '/') {
+    return false
+  }
+
+  const currentHash = route.hash || '#home'
+
+  return currentHash === hash
+}
 </script>
 
 <template>
@@ -17,10 +28,10 @@ const { isDark, toggle } = useTheme()
     <!-- Lado direito -->
     <div class="right">
       <nav class="menu">
-        <RouterLink :to="{ path: '/', hash: '#home' }">Home</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#projects' }">Projetos</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#about' }">Sobre</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#contact' }">Contato</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#home' }" :class="{ active: isSectionActive('#home') }">Home</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#projects' }" :class="{ active: isSectionActive('#projects') }">Projetos</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#about' }" :class="{ active: isSectionActive('#about') }">Sobre</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#contact' }" :class="{ active: isSectionActive('#contact') }">Contato</RouterLink>
       </nav>
 
       <button
@@ -99,7 +110,7 @@ const { isDark, toggle } = useTheme()
 }
 
 .menu a:hover::after,
-.menu a.router-link-active::after {
+.menu a.active::after {
   width: 100%;
 }
 
@@ -133,5 +144,24 @@ const { isDark, toggle } = useTheme()
   display: flex;
   align-items: center;
   gap: 2rem;
+}
+
+@media (max-width: 960px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .menu {
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
 }
 </style>

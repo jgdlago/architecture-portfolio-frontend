@@ -6,6 +6,8 @@
 body {
   background-color: var(--background);
   color: var(--primary-text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
 }
 </style>

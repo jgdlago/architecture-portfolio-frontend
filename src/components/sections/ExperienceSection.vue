@@ -1,44 +1,48 @@
 <template>
   <section class="experience">
     <header>
-      <h2>Atuação</h2>
-      <p>
-        Arquitetura aplicada a diferentes escalas e contextos,
-        sempre com atenção ao lugar e às pessoas.
-      </p>
+      <h2>{{ title }}</h2>
+      <p>{{ subtitle }}</p>
     </header>
 
     <div class="blocks">
-      <div class="block">
-        <h3>Tipologias</h3>
+      <div v-for="(block, index) in blocks" :key="`${block.title}-${index}`" class="block">
+        <h3>{{ block.title }}</h3>
         <ul>
-          <li>Residencial</li>
-          <li>Comercial</li>
-          <li>Institucional</li>
-          <li>Interiores</li>
-        </ul>
-      </div>
-
-      <div class="block">
-        <h3>Experiência</h3>
-        <ul>
-          <li>+6 anos de prática profissional</li>
-          <li>Projetos executivos e acompanhamento de obra</li>
-          <li>Atuação do conceito à execução</li>
-        </ul>
-      </div>
-
-      <div class="block">
-        <h3>Atuação</h3>
-        <ul>
-          <li>Brasil</li>
-          <li>Projetos remotos</li>
-          <li>Contextos urbanos e naturais</li>
+          <li v-for="(item, itemIndex) in block.items" :key="`${item}-${itemIndex}`">{{ item }}</li>
         </ul>
       </div>
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    title?: string
+    subtitle?: string
+    blocks?: Array<{ title: string; items: string[] }>
+  }>(),
+  {
+    title: 'Atuacao',
+    subtitle: 'Arquitetura aplicada a diferentes escalas e contextos, sempre com atencao ao lugar e as pessoas.',
+    blocks: () => [
+      {
+        title: 'Tipologias',
+        items: ['Residencial', 'Comercial', 'Institucional', 'Interiores'],
+      },
+      {
+        title: 'Experiencia',
+        items: ['+6 anos de pratica profissional', 'Projetos executivos e acompanhamento de obra', 'Atuacao do conceito a execucao'],
+      },
+      {
+        title: 'Atuacao',
+        items: ['Brasil', 'Projetos remotos', 'Contextos urbanos e naturais'],
+      },
+    ],
+  },
+)
+</script>
 
 <style scoped>
 .experience {
