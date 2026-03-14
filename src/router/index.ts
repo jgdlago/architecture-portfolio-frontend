@@ -32,7 +32,7 @@ const routes = [
     {
         path: '/about',
         name: 'about',
-        component: () => import('@/views/AboutView.vue'),
+        redirect: { path: '/', hash: '#about' },
     },
     {
         path: '/contact',

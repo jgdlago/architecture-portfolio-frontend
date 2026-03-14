@@ -39,7 +39,7 @@ watch(() => route.fullPath, () => {
       <nav class="menu">
         <RouterLink :to="{ path: '/', hash: '#home' }" :class="{ active: isSectionActive('#home') }">Home</RouterLink>
         <RouterLink to="/projects" :class="{ active: route.path.startsWith('/projects') }">Projetos</RouterLink>
-        <RouterLink to="/about" :class="{ active: route.path === '/about' }">Sobre</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#about' }" :class="{ active: isSectionActive('#about') }">Sobre</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#contact' }" :class="{ active: isSectionActive('#contact') }">Contato</RouterLink>
       </nav>
 
