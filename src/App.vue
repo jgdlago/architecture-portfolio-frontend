@@ -1,5 +1,13 @@
+<script setup lang="ts">
+import ToastContainer from '@/components/ui/ToastContainer.vue';
+import { usePageTracking } from '@/composables/usePageTracking';
+
+usePageTracking()
+</script>
+
 <template>
   <RouterView />
+  <ToastContainer />
 </template>
 
 <style>

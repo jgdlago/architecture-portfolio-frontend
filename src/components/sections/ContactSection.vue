@@ -2,6 +2,7 @@
 import InstagramIcon from '@/assets/icons/instagram.svg?component';
 import LinkedInIcon from '@/assets/icons/linkedin.svg?component';
 import WhatsAppIcon from '@/assets/icons/whatsapp.svg?component';
+import { useToast } from '@/composables/useToast';
 import { EnvelopeIcon } from '@heroicons/vue/24/outline';
 import { ref } from 'vue';
 import { http } from '../../api/http';
@@ -19,6 +20,7 @@ const form = ref<Form>({
 })
 
 const isSubmitting = ref(false)
+const toast = useToast()
 
 withDefaults(
   defineProps<{
@@ -48,10 +50,10 @@ const sendEmail = async () => {
 
   try {
     await http.post('/contact-messages', form.value)
-    alert('Mensagem enviada com sucesso!')
+    toast.success('Mensagem enviada com sucesso!')
     form.value = { name: '', email: '', message: '' }
   } catch {
-    alert('Nao foi possivel enviar a mensagem. Tente novamente.')
+    toast.error('Não foi possível enviar a mensagem. Tente novamente.')
   } finally {
     isSubmitting.value = false
   }

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useTheme } from '@/composables/useTheme';
-import { MoonIcon, SunIcon } from '@heroicons/vue/24/outline';
+import { Bars3Icon, MoonIcon, SunIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { ref, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 
 const { isDark, toggle } = useTheme()
 const route = useRoute()
+const mobileOpen = ref(false)
 
 const isSectionActive = (hash: string): boolean => {
   if (route.path !== '/') {
@@ -15,22 +17,29 @@ const isSectionActive = (hash: string): boolean => {
 
   return currentHash === hash
 }
+
+// Close mobile menu on route change
+watch(() => route.fullPath, () => {
+  mobileOpen.value = false
+})
 </script>
 
 <template>
   <header class="navbar">
     <!-- Marca -->
     <div class="brand">
-      <span class="name">Iara Tedesco</span>
-      <span class="role">Arquitetura & Urbanismo</span>
+      <RouterLink to="/" class="brand-link">
+        <span class="name">Iara Tedesco</span>
+        <span class="role">Arquitetura & Urbanismo</span>
+      </RouterLink>
     </div>
 
     <!-- Lado direito -->
-    <div class="right">
+    <div class="right" :class="{ open: mobileOpen }">
       <nav class="menu">
         <RouterLink :to="{ path: '/', hash: '#home' }" :class="{ active: isSectionActive('#home') }">Home</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#projects' }" :class="{ active: isSectionActive('#projects') }">Projetos</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#about' }" :class="{ active: isSectionActive('#about') }">Sobre</RouterLink>
+        <RouterLink to="/projects" :class="{ active: route.path.startsWith('/projects') }">Projetos</RouterLink>
+        <RouterLink to="/about" :class="{ active: route.path === '/about' }">Sobre</RouterLink>
         <RouterLink :to="{ path: '/', hash: '#contact' }" :class="{ active: isSectionActive('#contact') }">Contato</RouterLink>
       </nav>
 
@@ -43,6 +52,12 @@ const isSectionActive = (hash: string): boolean => {
         <MoonIcon v-else />
       </button>
     </div>
+
+    <!-- Mobile hamburger -->
+    <button class="hamburger" @click="mobileOpen = !mobileOpen" aria-label="Menu">
+      <XMarkIcon v-if="mobileOpen" />
+      <Bars3Icon v-else />
+    </button>
   </header>
 </template>
 
@@ -60,7 +75,8 @@ const isSectionActive = (hash: string): boolean => {
 }
 
 /* Marca */
-.brand {
+.brand-link {
+  text-decoration: none;
   display: flex;
   flex-direction: column;
   line-height: 1;
@@ -114,12 +130,7 @@ const isSectionActive = (hash: string): boolean => {
   width: 100%;
 }
 
-/* Ações */
-.actions {
-  display: flex;
-  align-items: center;
-}
-
+/* Theme toggle */
 .theme-toggle {
   background: none;
   border: none;
@@ -146,22 +157,57 @@ const isSectionActive = (hash: string): boolean => {
   gap: 2rem;
 }
 
-@media (max-width: 960px) {
+/* Hamburger - hidden on desktop */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  color: var(--primary-text);
+}
+
+.hamburger svg {
+  width: 24px;
+  height: 24px;
+}
+
+@media (max-width: 768px) {
   .navbar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1.5rem;
+    padding: 1.2rem 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .hamburger {
+    display: block;
   }
 
   .right {
+    display: none;
     width: 100%;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding-top: 1.5rem;
+  }
+
+  .right.open {
+    display: flex;
   }
 
   .menu {
-    gap: 1.25rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .menu a {
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+
+  .theme-toggle {
+    margin-top: 1rem;
   }
 }
 </style>
