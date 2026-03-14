@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { http } from '@/api/http';
 import InstagramIcon from '@/assets/icons/instagram.svg?component';
 import LinkedInIcon from '@/assets/icons/linkedin.svg?component';
 import WhatsAppIcon from '@/assets/icons/whatsapp.svg?component';
@@ -17,10 +18,24 @@ const form = ref<Form>({
   message: '',
 })
 
-const sendEmail = () => {
-  console.log('Enviando formulário:', form.value)
-  alert('Mensagem enviada! ✅')
-  form.value = { name: '', email: '', message: '' }
+const isSubmitting = ref(false)
+
+const sendEmail = async () => {
+  if (isSubmitting.value) {
+    return
+  }
+
+  isSubmitting.value = true
+
+  try {
+    await http.post('/contact-messages', form.value)
+    alert('Mensagem enviada com sucesso!')
+    form.value = { name: '', email: '', message: '' }
+  } catch {
+    alert('Nao foi possivel enviar a mensagem. Tente novamente.')
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -40,7 +55,9 @@ const sendEmail = () => {
           <input v-model="form.name" type="text" placeholder="Nome" required />
           <input v-model="form.email" type="email" placeholder="E-mail" required />
           <textarea v-model="form.message" placeholder="Mensagem" rows="5" required></textarea>
-          <button type="submit">Enviar</button>
+          <button type="submit" :disabled="isSubmitting">
+            {{ isSubmitting ? 'Enviando...' : 'Enviar' }}
+          </button>
         </form>
       </div>
 

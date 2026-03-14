@@ -9,15 +9,16 @@ export const useAuthStore = defineStore('auth', {
 
     actions: {
         async login(data: { email: string; password: string }) {
-            const response = await http.post('/login', data)
+            const response = await http.post('/auth/login', data)
             this.token = response.data.token
             http.defaults.headers.common.Authorization = `Bearer ${this.token}`
         },
 
         async logout() {
-            await http.post('/logout')
+            await http.post('/auth/logout')
             this.user = null
             this.token = null
+            delete http.defaults.headers.common.Authorization
         },
     },
 })
