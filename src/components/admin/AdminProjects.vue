@@ -8,6 +8,7 @@ import {
     fetchAdminProject,
     fetchAdminProjects,
     updateAdminProject,
+    updateProjectImage,
     uploadFile,
     type AdminCategory,
     type AdminProject,
@@ -16,7 +17,14 @@ import {
 import { resolveMediaUrl } from '@/api/http'
 import ImageUploader from '@/components/admin/ImageUploader.vue'
 import { useToast } from '@/composables/useToast'
-import { onMounted, ref } from 'vue'
+import { getApiErrorMessage, getFieldErrors, type FieldErrors } from '@/utils/apiErrors'
+import { computed, onMounted, ref } from 'vue'
+
+interface PendingImage {
+    path: string
+    url: string
+    isCover: boolean
+}
 
 const toast = useToast()
 
@@ -24,10 +32,13 @@ const projects = ref<AdminProject[]>([])
 const categories = ref<AdminCategory[]>([])
 const isLoading = ref(true)
 const isSaving = ref(false)
+const isUploadingGallery = ref(false)
 
 const editingProject = ref<AdminProject | null>(null)
 const projectImages = ref<AdminProjectImage[]>([])
+const pendingImages = ref<PendingImage[]>([])
 const showForm = ref(false)
+const fieldErrors = ref<FieldErrors>({})
 
 const form = ref(emptyForm())
 
@@ -47,6 +58,8 @@ function emptyForm() {
     }
 }
 
+const isEditing = computed(() => Boolean(editingProject.value))
+
 const loadProjects = async () => {
     isLoading.value = true
     try {
@@ -58,14 +71,27 @@ const loadProjects = async () => {
     }
 }
 
+const clearErrors = () => {
+    fieldErrors.value = {}
+}
+
+const setFieldError = (error: unknown) => {
+    fieldErrors.value = getFieldErrors(error)
+}
+
 const openNew = () => {
     editingProject.value = null
     form.value = emptyForm()
+    pendingImages.value = []
     projectImages.value = []
+    clearErrors()
     showForm.value = true
 }
 
 const openEdit = async (project: AdminProject) => {
+    clearErrors()
+    pendingImages.value = []
+
     try {
         const full = await fetchAdminProject(project.id)
         editingProject.value = full
@@ -74,7 +100,9 @@ const openEdit = async (project: AdminProject) => {
             slug: full.slug,
             short_description: full.short_description ?? '',
             description: full.description ?? '',
-            project_category_id: full.category_slug ? categories.value.find(c => c.slug === full.category_slug)?.id ?? '' : '',
+            project_category_id: full.category_slug
+                ? categories.value.find((c) => c.slug === full.category_slug)?.id ?? ''
+                : '',
             cover_image_path: full.cover_image_path ?? '',
             location: full.location ?? '',
             year: full.year ?? '',
@@ -84,21 +112,46 @@ const openEdit = async (project: AdminProject) => {
         }
         projectImages.value = full.images ?? []
         showForm.value = true
-    } catch {
-        toast.error('Erro ao carregar projeto.')
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao carregar projeto.'))
     }
 }
 
 const cancelEdit = () => {
     showForm.value = false
     editingProject.value = null
+    pendingImages.value = []
+    clearErrors()
+}
+
+const persistPendingImages = async (projectId: number) => {
+    if (!pendingImages.value.length) {
+        return
+    }
+
+    const created = await Promise.all(
+        pendingImages.value.map((img, index) =>
+            addProjectImage(projectId, {
+                image_path: img.path,
+                sort_order: index,
+                is_cover: img.isCover,
+            })
+        )
+    )
+
+    projectImages.value = created
 }
 
 const submitProject = async () => {
-    if (!form.value.title) return
+    if (!form.value.title) {
+        return
+    }
+
     isSaving.value = true
+    clearErrors()
+
     try {
-        const payload: Record<string, any> = {
+        const payload: Record<string, unknown> = {
             title: form.value.title,
             slug: form.value.slug || null,
             short_description: form.value.short_description || null,
@@ -116,13 +169,16 @@ const submitProject = async () => {
             await updateAdminProject(editingProject.value.id, payload)
             toast.success('Projeto atualizado.')
         } else {
-            await createAdminProject(payload)
-            toast.success('Projeto criado.')
+            const created = await createAdminProject(payload)
+            await persistPendingImages(created.id)
+            toast.success('Projeto criado com sucesso.')
         }
+
         showForm.value = false
         await loadProjects()
-    } catch {
-        toast.error('Erro ao salvar projeto.')
+    } catch (error) {
+        setFieldError(error)
+        toast.error(getApiErrorMessage(error, 'Erro ao salvar projeto.'))
     } finally {
         isSaving.value = false
     }
@@ -130,35 +186,47 @@ const submitProject = async () => {
 
 const removeProject = async (id: number) => {
     if (!confirm('Excluir este projeto?')) return
+
     try {
         await deleteAdminProject(id)
-        toast.success('Projeto excluído.')
+        toast.success('Projeto excluido.')
         await loadProjects()
-    } catch {
-        toast.error('Erro ao excluir projeto.')
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao excluir projeto.'))
     }
 }
 
-// Image management
-const isUploadingGallery = ref(false)
-
 const uploadGalleryImage = async (event: Event) => {
-    if (!editingProject.value) return
     const input = event.target as HTMLInputElement
     const file = input.files?.[0]
     if (!file) return
 
     isUploadingGallery.value = true
+
     try {
         const result = await uploadFile(file, 'projects')
-        const image = await addProjectImage(editingProject.value.id, {
-            image_path: result.path,
-            sort_order: projectImages.value.length,
-        })
-        projectImages.value.push(image)
+
+        if (editingProject.value) {
+            const image = await addProjectImage(editingProject.value.id, {
+                image_path: result.path,
+                sort_order: projectImages.value.length,
+            })
+            projectImages.value.push(image)
+        } else {
+            pendingImages.value.push({
+                path: result.path,
+                url: result.url,
+                isCover: pendingImages.value.length === 0 && !form.value.cover_image_path,
+            })
+
+            if (!form.value.cover_image_path) {
+                form.value.cover_image_path = result.path
+            }
+        }
+
         toast.success('Imagem adicionada.')
-    } catch {
-        toast.error('Erro ao enviar imagem.')
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao enviar imagem.'))
     } finally {
         isUploadingGallery.value = false
         input.value = ''
@@ -167,14 +235,63 @@ const uploadGalleryImage = async (event: Event) => {
 
 const removeImage = async (image: AdminProjectImage) => {
     if (!editingProject.value) return
+
     try {
         await deleteProjectImage(editingProject.value.id, image.id)
-        projectImages.value = projectImages.value.filter(i => i.id !== image.id)
+        projectImages.value = projectImages.value.filter((i) => i.id !== image.id)
+
+        if (form.value.cover_image_path === image.image_path) {
+            form.value.cover_image_path = ''
+        }
+
         toast.success('Imagem removida.')
-    } catch {
-        toast.error('Erro ao remover imagem.')
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao remover imagem.'))
     }
 }
+
+const removePendingImage = (imagePath: string) => {
+    pendingImages.value = pendingImages.value.filter((img) => img.path !== imagePath)
+
+    if (form.value.cover_image_path === imagePath) {
+        const next = pendingImages.value[0]
+        form.value.cover_image_path = next?.path ?? ''
+        pendingImages.value = pendingImages.value.map((img, idx) => ({
+            ...img,
+            isCover: idx === 0 && Boolean(next),
+        }))
+    }
+}
+
+const setCoverImage = async (image: AdminProjectImage) => {
+    if (!editingProject.value) {
+        return
+    }
+
+    try {
+        await updateProjectImage(editingProject.value.id, image.id, { is_cover: true })
+
+        projectImages.value = projectImages.value.map((img) => ({
+            ...img,
+            is_cover: img.id === image.id,
+        }))
+
+        form.value.cover_image_path = image.image_path
+        toast.success('Imagem definida como capa.')
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao definir imagem de capa.'))
+    }
+}
+
+const setPendingCoverImage = (imagePath: string) => {
+    pendingImages.value = pendingImages.value.map((img) => ({
+        ...img,
+        isCover: img.path === imagePath,
+    }))
+    form.value.cover_image_path = imagePath
+}
+
+const errorFor = (field: string): string => fieldErrors.value[field] || ''
 
 onMounted(loadProjects)
 </script>
@@ -183,48 +300,58 @@ onMounted(loadProjects)
     <div v-if="isLoading" class="loading">Carregando projetos...</div>
 
     <div v-else>
-        <!-- Form -->
         <div v-if="showForm" class="form-panel">
             <div class="form-header">
-                <h2>{{ editingProject ? 'Editar Projeto' : 'Novo Projeto' }}</h2>
+                <h2>{{ isEditing ? 'Editar Projeto' : 'Novo Projeto' }}</h2>
                 <button class="btn-text" @click="cancelEdit">Cancelar</button>
             </div>
 
             <form class="project-form" @submit.prevent="submitProject">
                 <div class="form-grid">
                     <div class="field">
-                        <label>Título *</label>
+                        <label>Titulo *</label>
                         <input v-model="form.title" required />
+                        <small v-if="errorFor('title')" class="field-error">{{ errorFor('title') }}</small>
                     </div>
+
                     <div class="field">
                         <label>Slug <small>(auto se vazio)</small></label>
                         <input v-model="form.slug" placeholder="gerado-automaticamente" />
+                        <small v-if="errorFor('slug')" class="field-error">{{ errorFor('slug') }}</small>
                     </div>
+
                     <div class="field">
                         <label>Categoria</label>
                         <select v-model="form.project_category_id">
                             <option value="">Sem categoria</option>
-                            <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                                {{ cat.name }}
-                            </option>
+                            <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                         </select>
+                        <small v-if="errorFor('project_category_id')" class="field-error">{{ errorFor('project_category_id') }}</small>
                     </div>
+
                     <div class="field">
                         <label>Local</label>
                         <input v-model="form.location" placeholder="Ex: Passo Fundo, RS" />
                     </div>
+
                     <div class="field">
                         <label>Ano</label>
                         <input v-model="form.year" type="number" min="1900" max="2100" />
+                        <small v-if="errorFor('year')" class="field-error">{{ errorFor('year') }}</small>
                     </div>
+
                     <div class="field">
-                        <label>Área (m²)</label>
+                        <label>Area (m2)</label>
                         <input v-model="form.area_m2" type="number" step="0.01" min="0" />
+                        <small v-if="errorFor('area_m2')" class="field-error">{{ errorFor('area_m2') }}</small>
                     </div>
+
                     <div class="field">
                         <label>Publicar em</label>
                         <input v-model="form.published_at" type="datetime-local" />
+                        <small v-if="errorFor('published_at')" class="field-error">{{ errorFor('published_at') }}</small>
                     </div>
+
                     <div class="field checkbox-field">
                         <label>
                             <input v-model="form.is_featured" type="checkbox" />
@@ -234,45 +361,81 @@ onMounted(loadProjects)
                 </div>
 
                 <div class="field">
-                    <label>Descrição curta</label>
+                    <label>Descricao curta</label>
                     <input v-model="form.short_description" placeholder="Resumo do projeto" />
+                    <small v-if="errorFor('short_description')" class="field-error">{{ errorFor('short_description') }}</small>
                 </div>
 
                 <div class="field">
-                    <label>Descrição completa</label>
+                    <label>Descricao completa</label>
                     <textarea v-model="form.description" rows="4"></textarea>
+                    <small v-if="errorFor('description')" class="field-error">{{ errorFor('description') }}</small>
                 </div>
 
                 <div class="field">
                     <label>Imagem de Capa</label>
                     <ImageUploader v-model="form.cover_image_path" folder="projects" />
+                    <small class="field-help">Voce tambem pode escolher uma capa na galeria abaixo.</small>
                 </div>
 
-                <!-- Gallery (only when editing) -->
-                <div v-if="editingProject" class="field">
+                <div class="field">
                     <label>Galeria de Imagens</label>
                     <div class="gallery-grid">
-                        <div v-for="img in projectImages" :key="img.id" class="gallery-item">
-                            <img :src="resolveMediaUrl(img.image_path)" :alt="img.alt_text || 'Imagem'" />
-                            <button type="button" class="remove-img" @click="removeImage(img)">×</button>
-                        </div>
+                        <template v-if="isEditing">
+                            <div v-for="img in projectImages" :key="img.id" class="gallery-item">
+                                <img :src="resolveMediaUrl(img.image_path)" :alt="img.alt_text || 'Imagem'" />
+                                <div class="gallery-actions">
+                                    <button
+                                        type="button"
+                                        class="cover-btn"
+                                        :class="{ active: img.is_cover || form.cover_image_path === img.image_path }"
+                                        @click="setCoverImage(img)"
+                                    >
+                                        {{ img.is_cover || form.cover_image_path === img.image_path ? 'Capa' : 'Definir capa' }}
+                                    </button>
+                                    <button type="button" class="remove-img" @click="removeImage(img)">Excluir</button>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template v-else>
+                            <div v-for="img in pendingImages" :key="img.path" class="gallery-item">
+                                <img :src="img.url" alt="Imagem" />
+                                <div class="gallery-actions">
+                                    <button
+                                        type="button"
+                                        class="cover-btn"
+                                        :class="{ active: img.isCover }"
+                                        @click="setPendingCoverImage(img.path)"
+                                    >
+                                        {{ img.isCover ? 'Capa' : 'Definir capa' }}
+                                    </button>
+                                    <button type="button" class="remove-img" @click="removePendingImage(img.path)">Excluir</button>
+                                </div>
+                            </div>
+                        </template>
+
                         <label class="add-image" :class="{ disabled: isUploadingGallery }">
-                            {{ isUploadingGallery ? '...' : '+' }}
-                            <input type="file" accept="image/jpeg,image/png,image/webp"
-                                :disabled="isUploadingGallery" @change="uploadGalleryImage" />
+                            {{ isUploadingGallery ? 'Enviando...' : '+ Adicionar' }}
+                            <input
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                :disabled="isUploadingGallery"
+                                @change="uploadGalleryImage"
+                            />
                         </label>
                     </div>
+                    <small v-if="!isEditing" class="field-help">As imagens enviadas agora serao vinculadas ao projeto apos clicar em criar.</small>
                 </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn-primary" :disabled="isSaving">
-                        {{ isSaving ? 'Salvando...' : editingProject ? 'Salvar Alterações' : 'Criar Projeto' }}
+                        {{ isSaving ? 'Salvando...' : isEditing ? 'Salvar alteracoes' : 'Criar projeto' }}
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- List -->
         <div v-else>
             <div class="list-header">
                 <h2>Projetos</h2>
@@ -284,14 +447,12 @@ onMounted(loadProjects)
             <ul class="project-list">
                 <li v-for="project in projects" :key="project.id" class="project-item">
                     <div class="project-thumb">
-                        <img v-if="project.cover_image_path" :src="resolveMediaUrl(project.cover_image_path)"
-                            :alt="project.title" />
+                        <img v-if="project.cover_image_path" :src="resolveMediaUrl(project.cover_image_path)" :alt="project.title" />
                         <div v-else class="no-image">Sem imagem</div>
                     </div>
                     <div class="project-info">
                         <strong>{{ project.title }}</strong>
-                        <small>{{ project.category || 'Sem categoria' }} · {{ project.location || '—' }} · {{
-                            project.year || '—' }}</small>
+                        <small>{{ project.category || 'Sem categoria' }} · {{ project.location || '—' }} · {{ project.year || '—' }}</small>
                         <div class="tags">
                             <span v-if="project.is_featured" class="tag featured">Destaque</span>
                             <span v-if="project.published_at" class="tag published">Publicado</span>
@@ -326,16 +487,16 @@ onMounted(loadProjects)
 .list-header h2,
 .form-header h2 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 
 .btn-primary {
     border: none;
-    border-radius: 8px;
-    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    padding: 0.65rem 1.2rem;
     background: var(--contrast-gold);
     color: var(--primary-text);
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
 }
 
@@ -353,21 +514,22 @@ onMounted(loadProjects)
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.75rem;
 }
 
 .project-item {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.8rem;
+    padding: 0.9rem;
     border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
-    border-radius: 8px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--background) 94%, black 6%);
 }
 
 .project-thumb {
-    width: 80px;
-    height: 60px;
+    width: 96px;
+    height: 72px;
     flex-shrink: 0;
     border-radius: 6px;
     overflow: hidden;
@@ -384,7 +546,7 @@ onMounted(loadProjects)
     height: 100%;
     display: grid;
     place-items: center;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     color: var(--contrast-brown);
     background: color-mix(in srgb, var(--contrast-brown) 15%, transparent);
 }
@@ -409,9 +571,9 @@ onMounted(loadProjects)
 
 .tag {
     font-size: 0.65rem;
-    padding: 0.1rem 0.5rem;
+    padding: 0.14rem 0.55rem;
     border-radius: 999px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .tag.featured {
@@ -437,8 +599,8 @@ onMounted(loadProjects)
 
 .project-actions button {
     border: none;
-    border-radius: 6px;
-    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    padding: 0.45rem 0.8rem;
     font-size: 0.8rem;
     background: color-mix(in srgb, var(--contrast-brown) 25%, transparent);
     color: var(--primary-text);
@@ -450,31 +612,30 @@ onMounted(loadProjects)
     color: #b83333;
 }
 
-/* Form */
 .form-panel {
-    background: color-mix(in srgb, var(--background) 93%, black 7%);
+    background: color-mix(in srgb, var(--background) 94%, black 6%);
     border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
-    border-radius: 10px;
-    padding: 1.2rem;
+    border-radius: 14px;
+    padding: 1.25rem;
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.8rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
     margin-bottom: 0.8rem;
 }
 
 .field {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    margin-bottom: 0.6rem;
+    gap: 0.35rem;
+    margin-bottom: 0.7rem;
 }
 
 .field label {
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 0.82rem;
+    font-weight: 600;
     color: var(--contrast-brown);
 }
 
@@ -482,8 +643,8 @@ onMounted(loadProjects)
 .field select,
 .field textarea {
     width: 100%;
-    padding: 0.6rem 0.8rem;
-    border-radius: 6px;
+    padding: 0.65rem 0.8rem;
+    border-radius: 8px;
     border: 1px solid color-mix(in srgb, var(--contrast-brown) 40%, transparent);
     background: var(--background);
     color: var(--primary-text);
@@ -500,56 +661,82 @@ onMounted(loadProjects)
     width: auto;
 }
 
+.field-error {
+    color: #c0392b;
+    font-size: 0.76rem;
+}
+
+.field-help {
+    color: var(--contrast-brown);
+    font-size: 0.76rem;
+}
+
 .form-actions {
     margin-top: 1rem;
 }
 
-/* Gallery */
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 0.7rem;
 }
 
 .gallery-item {
-    position: relative;
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
-    height: 90px;
+    border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
+    background: color-mix(in srgb, var(--background) 92%, black 8%);
 }
 
 .gallery-item img {
     width: 100%;
-    height: 100%;
+    height: 120px;
     object-fit: cover;
 }
 
-.remove-img {
-    position: absolute;
-    top: 3px;
-    right: 3px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: rgba(184, 51, 51, 0.85);
-    color: #fff;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
+.gallery-actions {
     display: grid;
-    place-items: center;
-    line-height: 1;
+    grid-template-columns: 1fr auto;
+    gap: 0.4rem;
+    padding: 0.45rem;
+}
+
+.cover-btn,
+.remove-img {
+    border: none;
+    border-radius: 6px;
+    padding: 0.35rem 0.45rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.cover-btn {
+    background: color-mix(in srgb, var(--contrast-brown) 20%, transparent);
+    color: var(--primary-text);
+}
+
+.cover-btn.active {
+    background: var(--contrast-gold);
+    font-weight: 700;
+}
+
+.remove-img {
+    background: color-mix(in srgb, #b83333 25%, transparent);
+    color: #b83333;
 }
 
 .add-image {
-    height: 90px;
+    min-height: 160px;
     display: grid;
     place-items: center;
     border: 2px dashed color-mix(in srgb, var(--contrast-brown) 35%, transparent);
-    border-radius: 6px;
-    font-size: 1.5rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
     color: var(--contrast-brown);
     cursor: pointer;
+    padding: 0.5rem;
+    text-align: center;
 }
 
 .add-image.disabled {
@@ -561,11 +748,13 @@ onMounted(loadProjects)
     display: none;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
     .form-grid {
         grid-template-columns: 1fr;
     }
+}
 
+@media (max-width: 650px) {
     .project-item {
         flex-direction: column;
         align-items: flex-start;
@@ -573,7 +762,11 @@ onMounted(loadProjects)
 
     .project-thumb {
         width: 100%;
-        height: 120px;
+        height: 140px;
+    }
+
+    .project-actions {
+        width: 100%;
     }
 }
 </style>

@@ -122,6 +122,15 @@ export async function addProjectImage(projectId: number, payload: Record<string,
     return data.data
 }
 
+export async function updateProjectImage(
+    projectId: number,
+    imageId: number,
+    payload: Record<string, any>
+): Promise<AdminProjectImage> {
+    const { data } = await http.put<{ data: AdminProjectImage }>(`/admin/projects/${projectId}/images/${imageId}`, payload)
+    return data.data
+}
+
 export async function deleteProjectImage(projectId: number, imageId: number): Promise<void> {
     await http.delete(`/admin/projects/${projectId}/images/${imageId}`)
 }

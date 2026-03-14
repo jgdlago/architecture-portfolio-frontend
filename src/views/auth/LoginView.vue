@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Navbar from '@/components/layout/Navbar.vue';
 import { useAuthStore } from '@/stores/auth';
+import { getApiErrorMessage, getFieldErrors, type FieldErrors } from '@/utils/apiErrors';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -11,6 +12,7 @@ const router = useRouter()
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
+const fieldErrors = ref<FieldErrors>({})
 const isSubmitting = ref(false)
 
 const redirectTo = computed(() => String(route.query.redirect || '/admin'))
@@ -21,13 +23,15 @@ const submit = async () => {
   }
 
   errorMessage.value = ''
+  fieldErrors.value = {}
   isSubmitting.value = true
 
   try {
     await auth.login({ email: email.value, password: password.value })
     await router.push(redirectTo.value)
-  } catch {
-    errorMessage.value = 'Nao foi possivel autenticar. Verifique email e senha.'
+  } catch (error) {
+    fieldErrors.value = getFieldErrors(error)
+    errorMessage.value = getApiErrorMessage(error, 'Nao foi possivel autenticar. Verifique email e senha.')
   } finally {
     isSubmitting.value = false
   }
@@ -44,11 +48,13 @@ const submit = async () => {
       <label>
         <span>Email</span>
         <input v-model="email" type="email" required placeholder="admin@exemplo.com" />
+        <small v-if="fieldErrors.email" class="field-error">{{ fieldErrors.email }}</small>
       </label>
 
       <label>
         <span>Senha</span>
         <input v-model="password" type="password" required placeholder="********" />
+        <small v-if="fieldErrors.password" class="field-error">{{ fieldErrors.password }}</small>
       </label>
 
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
@@ -117,5 +123,10 @@ button {
 .error {
   color: #b83333;
   font-size: 0.9rem;
+}
+
+.field-error {
+  color: #b83333;
+  font-size: 0.75rem;
 }
 </style>

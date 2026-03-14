@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { uploadFile } from '@/api/admin';
 import { resolveMediaUrl } from '@/api/http';
+import { useToast } from '@/composables/useToast';
 import { ref } from 'vue';
 
 const props = defineProps<{
@@ -14,8 +16,7 @@ const emit = defineEmits<{
 
 const isUploading = ref(false)
 const previewUrl = ref('')
-
-const { uploadFile } = await import('@/api/admin')
+const toast = useToast()
 
 const handleFileChange = async (event: Event) => {
     const input = event.target as HTMLInputElement
@@ -29,7 +30,7 @@ const handleFileChange = async (event: Event) => {
         emit('update:modelValue', result.path)
         emit('uploaded', result)
     } catch {
-        alert('Erro ao enviar imagem.')
+        toast.error('Erro ao enviar imagem. Tente novamente.')
     } finally {
         isUploading.value = false
         input.value = ''

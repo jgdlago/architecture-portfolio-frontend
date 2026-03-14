@@ -49,8 +49,8 @@ const doLogout = async () => {
 
 <style scoped>
 .admin-page {
-    padding: 2rem;
-    max-width: 1200px;
+    padding: var(--space-8);
+    max-width: 1240px;
     margin: 0 auto;
 }
 
@@ -58,25 +58,30 @@ const doLogout = async () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background: color-mix(in srgb, var(--background) 94%, black 6%);
+    border: 1px solid color-mix(in srgb, var(--contrast-brown) 16%, transparent);
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
 }
 
 .topbar h1 {
     margin: 0;
-    font-size: 1.3rem;
+    font-size: var(--text-xl);
 }
 
 .topbar p {
-    margin: 0.3rem 0 0;
-    font-size: 0.9rem;
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-sm);
     color: var(--contrast-brown);
 }
 
 .logout {
     border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    padding: 0.55rem 1rem;
     background: color-mix(in srgb, #b83333 25%, transparent);
     color: #b83333;
     font-weight: 600;
@@ -85,45 +90,54 @@ const doLogout = async () => {
 
 .tabs {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+    overflow-x: auto;
+    padding-bottom: var(--space-1);
 }
 
 .tabs button {
     border: none;
-    border-radius: 8px;
-    padding: 0.55rem 1rem;
-    font-size: 0.85rem;
+    border-radius: 999px;
+    padding: 0.6rem 1rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    white-space: nowrap;
     background: color-mix(in srgb, var(--contrast-brown) 20%, transparent);
     color: var(--primary-text);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
 .tabs button.active {
     background: var(--contrast-gold);
 }
 
+.tabs button:hover {
+    transform: translateY(-1px);
+}
+
 .tab-content {
-    background: color-mix(in srgb, var(--background) 95%, black 5%);
+    background: color-mix(in srgb, var(--background) 94%, black 6%);
     border: 1px solid color-mix(in srgb, var(--contrast-brown) 15%, transparent);
-    border-radius: 12px;
-    padding: 1.5rem;
+    border-radius: 16px;
+    padding: var(--space-6);
+    box-shadow: var(--shadow-md);
 }
 
 @media (max-width: 768px) {
     .admin-page {
-        padding: 1rem;
+        padding: var(--space-4);
     }
 
     .topbar {
         flex-direction: column;
         align-items: flex-start;
+        padding: var(--space-4);
     }
 
     .tab-content {
-        padding: 1rem;
+        padding: var(--space-4);
     }
 }
 </style>

@@ -2,6 +2,7 @@
 import { fetchAdminSettings, uploadFile, upsertAdminSetting } from '@/api/admin'
 import { resolveMediaUrl } from '@/api/http'
 import { useToast } from '@/composables/useToast'
+import { getApiErrorMessage } from '@/utils/apiErrors'
 import { onMounted, ref } from 'vue'
 
 type SiteSettingItem = {
@@ -73,8 +74,8 @@ const save = async (key: string, value: any) => {
     try {
         await upsertAdminSetting(key, value)
         toast.success(`"${key}" salvo com sucesso.`)
-    } catch {
-        toast.error(`Erro ao salvar "${key}".`)
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, `Erro ao salvar "${key}".`))
     } finally {
         isSaving.value = false
     }
@@ -99,8 +100,8 @@ const uploadAboutImage = async (e: Event) => {
     try {
         const result = await uploadFile(file, 'about')
         about.value.image_path = result.path
-    } catch {
-        toast.error('Erro ao enviar imagem.')
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao enviar imagem.'))
     } finally {
         isUploadingAbout.value = false
     }

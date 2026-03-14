@@ -6,6 +6,7 @@ import {
     type AdminCategory,
 } from '@/api/admin'
 import { useToast } from '@/composables/useToast'
+import { getApiErrorMessage, getFieldErrors, type FieldErrors } from '@/utils/apiErrors'
 import { onMounted, ref } from 'vue'
 
 const toast = useToast()
@@ -13,6 +14,7 @@ const categories = ref<AdminCategory[]>([])
 const isLoading = ref(true)
 const isSaving = ref(false)
 const form = ref({ name: '', slug: '' })
+const fieldErrors = ref<FieldErrors>({})
 
 const load = async () => {
     isLoading.value = true
@@ -26,13 +28,15 @@ const load = async () => {
 const submit = async () => {
     if (!form.value.name || !form.value.slug) return
     isSaving.value = true
+    fieldErrors.value = {}
     try {
         await createAdminCategory({ name: form.value.name, slug: form.value.slug, is_active: true })
         form.value = { name: '', slug: '' }
         categories.value = await fetchAdminCategories()
         toast.success('Categoria criada.')
-    } catch {
-        toast.error('Erro ao criar categoria.')
+    } catch (error) {
+        fieldErrors.value = getFieldErrors(error)
+        toast.error(getApiErrorMessage(error, 'Erro ao criar categoria.'))
     } finally {
         isSaving.value = false
     }
@@ -44,10 +48,12 @@ const remove = async (id: number) => {
         await deleteAdminCategory(id)
         categories.value = categories.value.filter(c => c.id !== id)
         toast.success('Categoria excluída.')
-    } catch {
-        toast.error('Erro ao excluir categoria.')
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao excluir categoria.'))
     }
 }
+
+const errorFor = (field: string): string => fieldErrors.value[field] || ''
 
 const autoSlug = () => {
     form.value.slug = form.value.name
@@ -71,6 +77,8 @@ onMounted(load)
             <input v-model="form.slug" placeholder="slug" required />
             <button :disabled="isSaving">{{ isSaving ? 'Salvando...' : 'Criar' }}</button>
         </form>
+        <p v-if="errorFor('name')" class="field-error">{{ errorFor('name') }}</p>
+        <p v-if="errorFor('slug')" class="field-error">{{ errorFor('slug') }}</p>
 
         <h3>Categorias cadastradas</h3>
         <div v-if="!categories.length" class="empty">Nenhuma categoria.</div>
@@ -92,6 +100,12 @@ onMounted(load)
 .empty {
     padding: 1rem;
     color: var(--contrast-brown);
+}
+
+.field-error {
+    margin: -1rem 0 0.8rem;
+    color: #c0392b;
+    font-size: 0.78rem;
 }
 
 .inline-form {
