@@ -31,8 +31,13 @@ onMounted(async () => {
             </div>
             <div class="card">
                 <span class="card-value">{{ stats.visits.last_7_days }}</span>
-                <span class="card-label">Visitas (7 dias)</span>
-                <small>{{ stats.visits.last_30_days }} nos últimos 30 dias</small>
+                <span class="card-label">Visitantes únicos (7 dias)</span>
+                <small>
+                    {{ stats.visits.last_30_days }} únicos nos últimos 30 dias
+                    <template v-if="stats.visits.page_views_last_30_days !== undefined">
+                        · {{ stats.visits.page_views_last_30_days }} page views
+                    </template>
+                </small>
             </div>
         </div>
 
@@ -54,7 +59,7 @@ onMounted(async () => {
                 <ul v-if="stats.visits.top_pages.length" class="top-pages">
                     <li v-for="page in stats.visits.top_pages" :key="page.page">
                         <span>{{ page.page }}</span>
-                        <span class="badge">{{ page.views }}</span>
+                        <span class="badge">{{ page.unique_visitors ?? page.views }} únicos</span>
                     </li>
                 </ul>
                 <p v-else class="empty">Nenhum dado de acesso ainda.</p>
@@ -62,11 +67,11 @@ onMounted(async () => {
         </div>
 
         <div v-if="stats.visits.daily.length" class="panel">
-            <h3>Visitas Diárias (30 dias)</h3>
+            <h3>Visitantes únicos por dia (30 dias)</h3>
             <div class="chart">
                 <div v-for="day in stats.visits.daily" :key="day.date" class="bar-group">
                     <div class="bar"
-                        :style="{ height: Math.max(4, (day.views / Math.max(...stats!.visits.daily.map(d => d.views))) * 100) + '%' }">
+                        :style="{ height: Math.max(4, ((day.unique_visitors ?? day.views) / Math.max(...stats!.visits.daily.map(d => d.unique_visitors ?? d.views))) * 100) + '%' }">
                     </div>
                     <small>{{ day.date.slice(5) }}</small>
                 </div>

@@ -55,8 +55,10 @@ export interface DashboardStats {
     visits: {
         last_7_days: number
         last_30_days: number
-        top_pages: Array<{ page: string; views: number }>
-        daily: Array<{ date: string; views: number }>
+        page_views_last_7_days?: number
+        page_views_last_30_days?: number
+        top_pages: Array<{ page: string; views: number; unique_visitors?: number }>
+        daily: Array<{ date: string; views: number; unique_visitors?: number }>
     }
 }
 
