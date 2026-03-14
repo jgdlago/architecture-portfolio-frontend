@@ -1,0 +1,49 @@
+:root {
+    --font-family-base: "Inter", "Segoe UI", sans-serif;
+    --font-size-h1: clamp(2.8rem, 6vw, 5rem);
+    --font-size-h2: clamp(1.5rem, 3vw, 2rem);
+    --font-size-h3: 1rem;
+    --font-size-body: 1rem;
+    --line-height-body: 1.7;
+    --section-padding-desktop: 6rem 3rem;
+    --section-padding-mobile: 4rem 1.5rem;
+
+    --background: #ECECEC;
+    --primary-text: #333333;
+    --contrast-gold: #B4A078;
+    --contrast-brown: #8C857A;
+    --accent: #6C7883;
+
+    /* Tokens para Hero */
+    --hero-text: #ffffff;
+    --hero-overlay: rgba(0, 0, 0, 0.55);
+
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.12);
+    --transition-fast: 0.16s ease;
+    --transition-base: 0.24s ease;
+}
+
+.dark {
+    --background: #1A1A1A;
+    --primary-text: #FFFFFF;
+    --contrast-gold: #A0895F;
+    --contrast-brown: #6B6354;
+    --accent: #5A6978;
+
+    --hero-text: #ffffff;
+    --hero-overlay: rgba(0, 0, 0, 0.65);
+}
