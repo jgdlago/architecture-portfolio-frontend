@@ -55,6 +55,6 @@ export async function fetchProjects(category?: string): Promise<ProjectListItem[
 }
 
 export async function fetchProjectBySlug(slug: string): Promise<ProjectDetail> {
-    const { data } = await http.get<ProjectDetail>(`/projects/${slug}`)
-    return data
+    const { data } = await http.get<{ data: ProjectDetail }>(`/projects/${slug}`)
+    return data.data
 }
