@@ -15,7 +15,7 @@ const toast = useToast()
 const isLoading = ref(true)
 const isSaving = ref(false)
 
-const hero = ref({ title: '', subtitle: '' })
+const hero = ref({ title: '', subtitle: '', image_path: '' })
 const about = ref({ text: '', image_path: '' })
 const contact = ref({ title: '', description: '', instagram_url: '', linkedin_url: '', email: '', whatsapp_url: '' })
 const footer = ref({ brand_name: '', brand_subtitle: '', email: '', phone: '', city: '', instagram_url: '', linkedin_url: '', copyright: '', cau: '' })
@@ -107,6 +107,21 @@ const uploadAboutImage = async (e: Event) => {
     }
 }
 
+const isUploadingHero = ref(false)
+const uploadHeroImage = async (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (!file) return
+    isUploadingHero.value = true
+    try {
+        const result = await uploadFile(file, 'hero')
+        hero.value.image_path = result.path
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao enviar imagem do banner.'))
+    } finally {
+        isUploadingHero.value = false
+    }
+}
+
 onMounted(load)
 </script>
 
@@ -132,6 +147,16 @@ onMounted(load)
             <div class="field">
                 <label>Subtítulo</label>
                 <input v-model="hero.subtitle" />
+            </div>
+            <div class="field">
+                <label>Imagem de fundo</label>
+                <div v-if="hero.image_path" class="preview-small">
+                    <img :src="resolveMediaUrl(hero.image_path)" alt="Banner principal" />
+                </div>
+                <label class="upload-label" :class="{ disabled: isUploadingHero }">
+                    {{ isUploadingHero ? 'Enviando...' : 'Selecionar imagem' }}
+                    <input type="file" accept="image/*" @change="uploadHeroImage" />
+                </label>
             </div>
             <button type="submit" class="btn-save" :disabled="isSaving">Salvar Banner Principal</button>
         </form>

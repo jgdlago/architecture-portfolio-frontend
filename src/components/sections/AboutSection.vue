@@ -1,7 +1,8 @@
 <template>
   <section class="about">
     <div class="image">
-      <img :src="image" alt="Arquiteta" />
+      <img v-if="image" :src="image" alt="Arquiteta" />
+      <div v-else class="image-placeholder">Imagem nao cadastrada</div>
     </div>
 
     <div class="content">
@@ -12,8 +13,6 @@
 </template>
 
 <script setup lang="ts">
-import fallbackImage from '@/assets/images/tmp/profile.png';
-
 withDefaults(
   defineProps<{
     text?: string
@@ -21,7 +20,7 @@ withDefaults(
   }>(),
   {
     text: 'Arquitetura como experiencia. Cada projeto nasce do dialogo entre espaco, contexto e quem o habita.',
-    image: fallbackImage,
+    image: undefined,
   },
 )
 </script>
@@ -39,6 +38,15 @@ withDefaults(
   width: 100%;
   object-fit: cover;
   filter: grayscale(100%);
+}
+
+.image-placeholder {
+  min-height: 340px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed color-mix(in srgb, var(--contrast-brown) 35%, transparent);
+  color: var(--contrast-brown);
+  font-size: 0.9rem;
 }
 
 .content h2 {

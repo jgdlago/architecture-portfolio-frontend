@@ -16,6 +16,7 @@ const featuredProjects = ref<HomeProjectItem[]>([])
 
 const heroTitle = computed(() => settings.value.hero?.title ?? 'Arquitetura como narrativa espacial')
 const heroSubtitle = computed(() => settings.value.hero?.subtitle ?? 'Projetos residenciais e comerciais guiados por luz, contexto e identidade.')
+const heroBackgroundImage = computed(() => resolveMediaUrl(settings.value.hero?.image_path) || '')
 const aboutText = computed(() => settings.value.about?.text ?? undefined)
 const aboutImage = computed(() => resolveMediaUrl(settings.value.about?.image_path) || undefined)
 
@@ -42,7 +43,7 @@ onMounted(async () => {
 <template>
   <div id="home">
     <Navbar />
-    <HeroSection :title="heroTitle" :subtitle="heroSubtitle" />
+    <HeroSection :title="heroTitle" :subtitle="heroSubtitle" :background-image="heroBackgroundImage" />
   </div>
 
   <div id="projects">

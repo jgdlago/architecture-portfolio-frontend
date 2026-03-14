@@ -13,7 +13,8 @@
         :to="`/projects/${project.slug}`"
       >
         <div class="image-wrapper">
-          <img :src="resolveMediaUrl(project.cover_image_path) || fallbackImage" :alt="project.title" />
+          <img v-if="resolveMediaUrl(project.cover_image_path)" :src="resolveMediaUrl(project.cover_image_path)" :alt="project.title" />
+          <div v-else class="no-image">Sem imagem cadastrada</div>
         </div>
 
         <div class="info">
@@ -28,7 +29,6 @@
 <script setup lang="ts">
 import type { HomeProjectItem } from '@/api/home';
 import { resolveMediaUrl } from '@/api/http';
-import fallbackImage from '@/assets/images/tmp/image-1.jpg';
 import { RouterLink } from 'vue-router';
 
 defineProps<{
@@ -75,6 +75,8 @@ defineProps<{
 
 .image-wrapper {
   overflow: hidden;
+  min-height: 260px;
+  background: color-mix(in srgb, var(--contrast-brown) 12%, transparent);
 }
 
 .image-wrapper img {
@@ -82,6 +84,15 @@ defineProps<{
   height: 100%;
   object-fit: cover;
   transition: transform 0.6s ease;
+}
+
+.no-image {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  font-size: 0.85rem;
+  color: var(--contrast-brown);
+  letter-spacing: 0.04em;
 }
 
 .project:hover img {

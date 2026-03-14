@@ -1,32 +1,40 @@
 <template>
-  <section class="hero">
+  <section class="hero" :style="heroStyle">
     <div class="overlay">
       <div class="content">
-        <h1>{{ title }}</h1>
+        <h1>{{ props.title }}</h1>
 
-        <p>{{ subtitle }}</p>
+        <p>{{ props.subtitle }}</p>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-withDefaults(
+import { computed } from 'vue';
+
+const props = withDefaults(
   defineProps<{
     title?: string
     subtitle?: string
+    backgroundImage?: string
   }>(),
   {
     title: 'Arquitetura como narrativa espacial',
     subtitle: 'Projetos residenciais e comerciais guiados por luz, contexto e identidade.',
+    backgroundImage: '',
   },
 )
+
+const heroStyle = computed(() => ({
+  backgroundImage: props.backgroundImage ? `url('${props.backgroundImage}')` : 'none',
+}))
 </script>
 
 <style scoped>
 .hero {
   height: 100vh;
-  background-image: url('@/assets/images/hero.jpg');
+  background-color: color-mix(in srgb, var(--background) 88%, black 12%);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
