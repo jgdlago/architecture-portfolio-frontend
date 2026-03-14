@@ -28,7 +28,10 @@ onMounted(async () => {
   try {
     const data = await fetchHomeContent()
     settings.value = data.settings ?? {}
-    featuredProjects.value = data.featured_projects?.data ?? []
+    const featured = data.featured_projects
+    featuredProjects.value = Array.isArray(featured)
+      ? featured
+      : featured?.data ?? []
   } catch {
     settings.value = {}
     featuredProjects.value = []

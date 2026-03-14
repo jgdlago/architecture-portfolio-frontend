@@ -17,7 +17,7 @@ export interface HomePayload {
     settings: Record<string, any>
     featured_projects: {
         data: HomeProjectItem[]
-    }
+    } | HomeProjectItem[]
 }
 
 export async function fetchHomeContent(): Promise<HomePayload> {

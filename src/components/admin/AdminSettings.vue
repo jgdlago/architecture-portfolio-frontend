@@ -4,6 +4,12 @@ import { resolveMediaUrl } from '@/api/http'
 import { useToast } from '@/composables/useToast'
 import { onMounted, ref } from 'vue'
 
+type SiteSettingItem = {
+    id: number
+    key: string
+    value: unknown
+}
+
 const toast = useToast()
 const isLoading = ref(true)
 const isSaving = ref(false)
@@ -16,25 +22,43 @@ const process = ref({ title: '', steps: [] as Array<{ title: string; description
 const experience = ref({ title: '', subtitle: '', blocks: [] as Array<{ title: string; items: string[] }> })
 
 const activeSection = ref<'hero' | 'about' | 'contact' | 'footer' | 'process' | 'experience'>('hero')
+const sectionLabels: Record<typeof activeSection.value, string> = {
+    hero: 'Banner Principal',
+    about: 'Sobre',
+    process: 'Processo',
+    experience: 'Experiência',
+    contact: 'Contato',
+    footer: 'Rodapé',
+}
 
 const load = async () => {
     isLoading.value = true
     try {
         const settings = await fetchAdminSettings()
-        const map = settings.reduce((acc, s) => { acc[s.key] = s.value; return acc }, {} as Record<string, any>)
+        const map = (settings as SiteSettingItem[]).reduce<Record<string, unknown>>((acc, setting) => {
+            acc[setting.key] = setting.value
+            return acc
+        }, {})
 
-        if (map.hero) Object.assign(hero.value, map.hero)
-        if (map.about) Object.assign(about.value, map.about)
-        if (map.contact) Object.assign(contact.value, map.contact)
-        if (map.footer) Object.assign(footer.value, map.footer)
-        if (map.process) {
-            process.value.title = map.process.title ?? ''
-            process.value.steps = map.process.steps ?? []
+        if (map.hero && typeof map.hero === 'object') Object.assign(hero.value, map.hero)
+        if (map.about && typeof map.about === 'object') Object.assign(about.value, map.about)
+        if (map.contact && typeof map.contact === 'object') Object.assign(contact.value, map.contact)
+        if (map.footer && typeof map.footer === 'object') Object.assign(footer.value, map.footer)
+        if (map.process && typeof map.process === 'object') {
+            const processValue = map.process as { title?: string; steps?: Array<{ title: string; description: string }> }
+            process.value.title = processValue.title ?? ''
+            process.value.steps = processValue.steps ?? []
         }
-        if (map.experience) {
-            experience.value.title = map.experience.title ?? ''
-            experience.value.subtitle = map.experience.subtitle ?? ''
-            experience.value.blocks = (map.experience.blocks ?? []).map((b: any) => ({
+        if (map.experience && typeof map.experience === 'object') {
+            const experienceValue = map.experience as {
+                title?: string
+                subtitle?: string
+                blocks?: Array<{ title?: string; items?: string[] }>
+            }
+
+            experience.value.title = experienceValue.title ?? ''
+            experience.value.subtitle = experienceValue.subtitle ?? ''
+            experience.value.blocks = (experienceValue.blocks ?? []).map((b) => ({
                 title: b.title ?? '',
                 items: b.items ?? [],
             }))
@@ -92,13 +116,14 @@ onMounted(load)
         <nav class="section-nav">
             <button v-for="sec in (['hero', 'about', 'process', 'experience', 'contact', 'footer'] as const)"
                 :key="sec" :class="{ active: activeSection === sec }" @click="activeSection = sec">
-                {{ sec.charAt(0).toUpperCase() + sec.slice(1) }}
+                {{ sectionLabels[sec] }}
             </button>
         </nav>
 
         <!-- Hero -->
         <form v-if="activeSection === 'hero'" class="section-form" @submit.prevent="save('hero', hero)">
-            <h2>Hero</h2>
+            <h2>Banner Principal</h2>
+            <p class="section-help">Este conteúdo aparece no topo da página inicial.</p>
             <div class="field">
                 <label>Título</label>
                 <input v-model="hero.title" />
@@ -107,7 +132,7 @@ onMounted(load)
                 <label>Subtítulo</label>
                 <input v-model="hero.subtitle" />
             </div>
-            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Hero</button>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Banner Principal</button>
         </form>
 
         <!-- About -->
@@ -169,7 +194,7 @@ onMounted(load)
                         <input v-model="block.title" placeholder="Título do bloco" />
                         <button type="button" class="btn-remove" @click="removeBlock(i)">×</button>
                     </div>
-                    <div v-for="(item, j) in block.items" :key="j" class="block-item">
+                    <div v-for="(_, j) in block.items" :key="j" class="block-item">
                         <input v-model="block.items[j]" placeholder="Item" />
                         <button type="button" class="btn-remove-sm" @click="removeBlockItem(block, j)">×</button>
                     </div>
@@ -256,6 +281,12 @@ onMounted(load)
 .section-form h2 {
     margin: 0 0 1rem;
     font-size: 1rem;
+}
+
+.section-help {
+    margin: -0.4rem 0 1rem;
+    font-size: 0.82rem;
+    color: var(--contrast-brown);
 }
 
 .form-grid {

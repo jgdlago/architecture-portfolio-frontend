@@ -2,6 +2,7 @@
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import axios from 'axios'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { resolveMediaUrl } from '../api/http'
@@ -10,6 +11,7 @@ import { fetchProjectBySlug, type ProjectDetail } from '../api/projects'
 const route = useRoute()
 const project = ref<ProjectDetail | null>(null)
 const isLoading = ref(true)
+const loadError = ref(false)
 
 const slug = computed(() => String(route.params.slug || ''))
 
@@ -74,6 +76,14 @@ onMounted(async () => {
   document.addEventListener('keydown', onKeydown)
   try {
     project.value = await fetchProjectBySlug(slug.value)
+    loadError.value = false
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      project.value = null
+      loadError.value = false
+    } else {
+      loadError.value = true
+    }
   } finally {
     isLoading.value = false
   }
@@ -186,6 +196,11 @@ onUnmounted(() => {
         </Transition>
       </Teleport>
     </template>
+
+    <div v-else-if="loadError" class="not-found">
+      <p>Não foi possível carregar o projeto no momento.</p>
+      <RouterLink to="/projects" class="back-link">Voltar para projetos</RouterLink>
+    </div>
 
     <div v-else class="not-found">
       <p>Projeto não encontrado.</p>
