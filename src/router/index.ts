@@ -11,14 +11,42 @@ const routes = [
         name: 'login',
         component: () => import('@/views/auth/LoginView.vue'),
     },
-    // {
-    //     path: '/register',
-    //     name: 'register',
-    //     component: () => import('@/views/auth/RegisterView.vue'),
-    // },
+    {
+        path: '/projects',
+        name: 'projects',
+        redirect: { path: '/', hash: '#projects' },
+    },
+    {
+        path: '/projects/:slug',
+        name: 'project-detail',
+        component: () => import('@/views/ProjectDetailView.vue'),
+    },
+    {
+        path: '/about',
+        name: 'about',
+        redirect: { path: '/', hash: '#about' },
+    },
+    {
+        path: '/contact',
+        name: 'contact',
+        redirect: { path: '/', hash: '#contact' },
+    },
 ]
 
 export const router = createRouter({
     history: createWebHistory(),
     routes,
+    scrollBehavior(to) {
+        if (to.hash) {
+            return {
+                el: to.hash,
+                behavior: 'smooth',
+            }
+        }
+
+        return {
+            top: 0,
+            behavior: 'smooth',
+        }
+    },
 })

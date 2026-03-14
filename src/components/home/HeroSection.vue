@@ -2,19 +2,26 @@
   <section class="hero">
     <div class="overlay">
       <div class="content">
-        <h1>
-          Arquitetura como<br />
-          narrativa espacial
-        </h1>
+        <h1>{{ title }}</h1>
 
-        <p>
-          Projetos residenciais e comerciais guiados
-          por luz, contexto e identidade.
-        </p>
+        <p>{{ subtitle }}</p>
       </div>
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    title?: string
+    subtitle?: string
+  }>(),
+  {
+    title: 'Arquitetura como narrativa espacial',
+    subtitle: 'Projetos residenciais e comerciais guiados por luz, contexto e identidade.',
+  },
+)
+</script>
 
 <style scoped>
 .hero {

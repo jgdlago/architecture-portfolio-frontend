@@ -6,64 +6,34 @@
     </header>
 
     <div class="grid">
-      <article
+      <RouterLink
         v-for="project in projects"
         :key="project.id"
         class="project"
+        :to="`/projects/${project.slug}`"
       >
         <div class="image-wrapper">
-          <img :src="project.image" :alt="project.title" />
+          <img :src="resolveMediaUrl(project.cover_image_path) || fallbackImage" :alt="project.title" />
         </div>
 
         <div class="info">
           <h3>{{ project.title }}</h3>
-          <span>{{ project.type }}</span>
+          <span>{{ project.category || 'Projeto' }}</span>
         </div>
-      </article>
+      </RouterLink>
     </div>
   </section>
 </template>
 
-<!-- Mock para testes -->
 <script setup lang="ts">
-import image1 from '@/assets/images/tmp/image-1.jpg'
-import image2 from '@/assets/images/tmp/image-2.jpg'
-import image3 from '@/assets/images/tmp/image-3.jpg'
-import image4 from '@/assets/images/tmp/image-4.jpg'
+import type { HomeProjectItem } from '@/api/home';
+import { resolveMediaUrl } from '@/api/http';
+import fallbackImage from '@/assets/images/tmp/image-1.jpg';
+import { RouterLink } from 'vue-router';
 
-interface Project {
-  id: number
-  title: string
-  type: string
-  image: string
-}
-
-const projects: Project[] = [
-  {
-    id: 1,
-    title: 'Residência Dal Lago',
-    type: 'Residencial',
-    image: image1,
-  },
-  {
-    id: 2,
-    title: 'Mansão Fazendas Tedesco',
-    type: 'Residencial / Comercial',
-    image: image2,
-  },
-  {
-    id: 3,
-    title: 'Casa De Campo',
-    type: 'Residencial',
-    image: image3,
-  },
-  {
-    id: 4,
-    title: 'Estúdios Netflix',
-    type: 'Comercial',
-    image: image4,
-  },
-]
+defineProps<{
+  projects: HomeProjectItem[]
+}>()
 </script>
 
 
@@ -98,6 +68,8 @@ const projects: Project[] = [
 }
 
 .project {
+  text-decoration: none;
+  color: inherit;
   cursor: pointer;
 }
 

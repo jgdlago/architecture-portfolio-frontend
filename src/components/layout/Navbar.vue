@@ -17,10 +17,10 @@ const { isDark, toggle } = useTheme()
     <!-- Lado direito -->
     <div class="right">
       <nav class="menu">
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/projects">Projetos</RouterLink>
-        <RouterLink to="/about">Sobre</RouterLink>
-        <RouterLink to="/contact">Contato</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#home' }">Home</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#projects' }">Projetos</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#about' }">Sobre</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#contact' }">Contato</RouterLink>
       </nav>
 
       <button

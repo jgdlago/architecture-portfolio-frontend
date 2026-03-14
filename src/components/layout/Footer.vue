@@ -3,24 +3,24 @@
     <div class="footer-wrapper">
       <div class="footer-content">
         <div class="footer-section brand">
-          <h3>Iara Tedesco</h3>
-          <p>Arquitetura e Urbanismo</p>
+          <h3>{{ brandName }}</h3>
+          <p>{{ brandSubtitle }}</p>
         </div>
 
         <div class="footer-section contact">
           <h4>Contato</h4>
           <ul>
-            <li>contato@exemplo.com</li>
-            <li>+55 (51) 9999-9999</li>
-            <li>Passo Fundo, RS</li>
+            <li>{{ email }}</li>
+            <li>{{ phone }}</li>
+            <li>{{ city }}</li>
           </ul>
         </div>
 
         <div class="footer-section social">
           <h4>Redes</h4>
           <ul>
-            <li><a href="#" target="_blank">Instagram</a></li>
-            <li><a href="#" target="_blank">LinkedIn</a></li>
+            <li><a :href="instagramUrl" target="_blank">Instagram</a></li>
+            <li><a :href="linkedinUrl" target="_blank">LinkedIn</a></li>
           </ul>
         </div>
 
@@ -35,12 +35,39 @@
       </div>
 
       <div class="footer-bottom">
-        <p>© 2026 Todos os direitos reservados</p>
-        <p>CAU/BR A304967-1</p>
+        <p>{{ copyrightText }}</p>
+        <p>{{ cau }}</p>
       </div>
     </div>
   </footer>
 </template>
+
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    brandName?: string
+    brandSubtitle?: string
+    email?: string
+    phone?: string
+    city?: string
+    instagramUrl?: string
+    linkedinUrl?: string
+    copyrightText?: string
+    cau?: string
+  }>(),
+  {
+    brandName: 'Iara Tedesco',
+    brandSubtitle: 'Arquitetura e Urbanismo',
+    email: 'contato@exemplo.com',
+    phone: '+55 (51) 9999-9999',
+    city: 'Passo Fundo, RS',
+    instagramUrl: '#',
+    linkedinUrl: '#',
+    copyrightText: '© 2026 Todos os direitos reservados',
+    cau: 'CAU/BR A304967-1',
+  },
+)
+</script>
 
 <style scoped>
 .footer {
