@@ -2,6 +2,7 @@
 import AdminCategories from '@/components/admin/AdminCategories.vue'
 import AdminDashboard from '@/components/admin/AdminDashboard.vue'
 import AdminMessages from '@/components/admin/AdminMessages.vue'
+import AdminProfile from '@/components/admin/AdminProfile.vue'
 import AdminProjects from '@/components/admin/AdminProjects.vue'
 import AdminSettings from '@/components/admin/AdminSettings.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -11,7 +12,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const auth = useAuthStore()
 
-const activeTab = ref<'dashboard' | 'projects' | 'categories' | 'messages' | 'settings'>('dashboard')
+const activeTab = ref<'dashboard' | 'projects' | 'categories' | 'messages' | 'settings' | 'profile'>('dashboard')
 
 const doLogout = async () => {
     await auth.logout()
@@ -35,6 +36,7 @@ const doLogout = async () => {
             <button :class="{ active: activeTab === 'categories' }" @click="activeTab = 'categories'">Categorias</button>
             <button :class="{ active: activeTab === 'messages' }" @click="activeTab = 'messages'">Mensagens</button>
             <button :class="{ active: activeTab === 'settings' }" @click="activeTab = 'settings'">Conteúdo</button>
+            <button :class="{ active: activeTab === 'profile' }" @click="activeTab = 'profile'">Perfil</button>
         </nav>
 
         <section class="tab-content">
@@ -42,7 +44,8 @@ const doLogout = async () => {
             <AdminProjects v-else-if="activeTab === 'projects'" />
             <AdminCategories v-else-if="activeTab === 'categories'" />
             <AdminMessages v-else-if="activeTab === 'messages'" />
-            <AdminSettings v-else />
+            <AdminSettings v-else-if="activeTab === 'settings'" />
+            <AdminProfile v-else />
         </section>
     </main>
 </template>

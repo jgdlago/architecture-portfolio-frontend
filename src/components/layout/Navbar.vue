@@ -8,6 +8,25 @@ const { isDark, toggle } = useTheme()
 const route = useRoute()
 const mobileOpen = ref(false)
 
+withDefaults(
+  defineProps<{
+    brandName?: string
+    brandRole?: string
+    homeLabel?: string
+    projectsLabel?: string
+    aboutLabel?: string
+    contactLabel?: string
+  }>(),
+  {
+    brandName: 'Iara Tedesco',
+    brandRole: 'Arquitetura & Urbanismo',
+    homeLabel: 'Home',
+    projectsLabel: 'Projetos',
+    aboutLabel: 'Sobre',
+    contactLabel: 'Contato',
+  },
+)
+
 const isSectionActive = (hash: string): boolean => {
   if (route.path !== '/') {
     return false
@@ -29,18 +48,18 @@ watch(() => route.fullPath, () => {
     <!-- Marca -->
     <div class="brand">
       <RouterLink to="/" class="brand-link">
-        <span class="name">Iara Tedesco</span>
-        <span class="role">Arquitetura & Urbanismo</span>
+        <span class="name">{{ brandName }}</span>
+        <span class="role">{{ brandRole }}</span>
       </RouterLink>
     </div>
 
     <!-- Lado direito -->
     <div class="right" :class="{ open: mobileOpen }">
       <nav class="menu">
-        <RouterLink :to="{ path: '/', hash: '#home' }" :class="{ active: isSectionActive('#home') }">Home</RouterLink>
-        <RouterLink to="/projects" :class="{ active: route.path.startsWith('/projects') }">Projetos</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#about' }" :class="{ active: isSectionActive('#about') }">Sobre</RouterLink>
-        <RouterLink :to="{ path: '/', hash: '#contact' }" :class="{ active: isSectionActive('#contact') }">Contato</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#home' }" :class="{ active: isSectionActive('#home') }">{{ homeLabel }}</RouterLink>
+        <RouterLink to="/projects" :class="{ active: route.path.startsWith('/projects') }">{{ projectsLabel }}</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#about' }" :class="{ active: isSectionActive('#about') }">{{ aboutLabel }}</RouterLink>
+        <RouterLink :to="{ path: '/', hash: '#contact' }" :class="{ active: isSectionActive('#contact') }">{{ contactLabel }}</RouterLink>
       </nav>
 
       <button

@@ -62,10 +62,41 @@ export interface DashboardStats {
     }
 }
 
+export interface AdminAccount {
+    id: number
+    name: string
+    email: string
+    cau: string | null
+}
+
 // Dashboard
 export async function fetchDashboardStats(): Promise<DashboardStats> {
     const { data } = await http.get<DashboardStats>('/admin/dashboard/stats')
     return data
+}
+
+// Account
+export async function fetchAdminAccount(): Promise<AdminAccount> {
+    const { data } = await http.get<AdminAccount>('/auth/me')
+    return data
+}
+
+export async function updateAdminAccount(payload: {
+    name: string
+    email: string
+    cau?: string | null
+    current_password?: string
+}): Promise<AdminAccount> {
+    const { data } = await http.put<{ user: AdminAccount }>('/admin/account', payload)
+    return data.user
+}
+
+export async function updateAdminAccountPassword(payload: {
+    current_password: string
+    password: string
+    password_confirmation: string
+}): Promise<void> {
+    await http.put('/admin/account/password', payload)
 }
 
 // Categories

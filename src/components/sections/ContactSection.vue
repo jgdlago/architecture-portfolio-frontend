@@ -3,6 +3,7 @@ import InstagramIcon from '@/assets/icons/instagram.svg?component';
 import LinkedInIcon from '@/assets/icons/linkedin.svg?component';
 import WhatsAppIcon from '@/assets/icons/whatsapp.svg?component';
 import { useToast } from '@/composables/useToast';
+import { getApiErrorMessage } from '@/utils/apiErrors';
 import { EnvelopeIcon } from '@heroicons/vue/24/outline';
 import { ref } from 'vue';
 import { http } from '../../api/http';
@@ -21,6 +22,7 @@ const form = ref<Form>({
 
 const isSubmitting = ref(false)
 const toast = useToast()
+const formError = ref('')
 
 withDefaults(
   defineProps<{
@@ -46,14 +48,31 @@ const sendEmail = async () => {
     return
   }
 
+  if (form.value.name.trim().length < 2) {
+    formError.value = 'Informe um nome com pelo menos 2 caracteres.'
+    return
+  }
+
+  if (!/.+@.+\..+/.test(form.value.email)) {
+    formError.value = 'Informe um e-mail válido.'
+    return
+  }
+
+  if (form.value.message.trim().length < 10) {
+    formError.value = 'A mensagem deve ter pelo menos 10 caracteres.'
+    return
+  }
+
+  formError.value = ''
+
   isSubmitting.value = true
 
   try {
     await http.post('/contact-messages', form.value)
     toast.success('Mensagem enviada com sucesso!')
     form.value = { name: '', email: '', message: '' }
-  } catch {
-    toast.error('Não foi possível enviar a mensagem. Tente novamente.')
+  } catch (error) {
+    toast.error(getApiErrorMessage(error, 'Não foi possível enviar a mensagem. Tente novamente.'))
   } finally {
     isSubmitting.value = false
   }
@@ -76,6 +95,7 @@ const sendEmail = async () => {
           <input v-model="form.name" type="text" placeholder="Nome" required />
           <input v-model="form.email" type="email" placeholder="E-mail" required />
           <textarea v-model="form.message" placeholder="Mensagem" rows="5" required></textarea>
+          <p v-if="formError" class="form-error">{{ formError }}</p>
           <button type="submit" :disabled="isSubmitting">
             {{ isSubmitting ? 'Enviando...' : 'Enviar' }}
           </button>
@@ -198,6 +218,12 @@ const sendEmail = async () => {
 .contact-form button:hover {
   background-color: var(--contrast-brown);
   transform: translateY(-2px);
+}
+
+.form-error {
+  margin: 0;
+  color: #c0392b;
+  font-size: 0.82rem;
 }
 
 /* Redes sociais */
