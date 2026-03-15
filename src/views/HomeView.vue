@@ -21,9 +21,25 @@ const aboutText = computed(() => settings.value.about?.text ?? undefined)
 const aboutImage = computed(() => resolveMediaUrl(settings.value.about?.image_path) || undefined)
 
 const footer = computed(() => settings.value.footer ?? {})
+const navbar = computed(() => settings.value.navbar ?? {})
+const featured = computed(() => settings.value.featured_projects ?? {})
+const footerServices = computed(() => settings.value.footer_services ?? {})
+const seo = computed(() => settings.value.seo ?? {})
 const process = computed(() => settings.value.process ?? {})
 const experience = computed(() => settings.value.experience ?? {})
 const contact = computed(() => settings.value.contact ?? {})
+
+const applySeo = () => {
+  const seoTitle = seo.value.title || 'Portfolio de Arquitetura'
+  const seoDescription = seo.value.description || 'Portfolio de arquitetura com projetos residenciais e comerciais.'
+
+  document.title = seoTitle
+
+  const tag = document.querySelector('meta[name="description"]')
+  if (tag) {
+    tag.setAttribute('content', seoDescription)
+  }
+}
 
 onMounted(async () => {
   try {
@@ -37,17 +53,30 @@ onMounted(async () => {
     settings.value = {}
     featuredProjects.value = []
   }
+
+  applySeo()
 })
 </script>
 
 <template>
   <div id="home">
-    <Navbar />
+    <Navbar
+      :brand-name="navbar.brand_name"
+      :brand-role="navbar.brand_role"
+      :home-label="navbar.home_label"
+      :projects-label="navbar.projects_label"
+      :about-label="navbar.about_label"
+      :contact-label="navbar.contact_label"
+    />
     <HeroSection :title="heroTitle" :subtitle="heroSubtitle" :background-image="heroBackgroundImage" />
   </div>
 
   <div id="projects">
-    <FeaturedProjects :projects="featuredProjects" />
+    <FeaturedProjects
+      :projects="featuredProjects"
+      :title="featured.title"
+      :description="featured.description"
+    />
   </div>
 
   <div id="about">
@@ -78,6 +107,8 @@ onMounted(async () => {
     :linkedin-url="footer.linkedin_url"
     :copyright-text="footer.copyright"
     :cau="footer.cau"
+    :services-title="footerServices.title"
+    :services-items="footerServices.items"
   />
 </template>
 

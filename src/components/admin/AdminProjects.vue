@@ -16,6 +16,7 @@ import {
 } from '@/api/admin'
 import { resolveMediaUrl } from '@/api/http'
 import ImageUploader from '@/components/admin/ImageUploader.vue'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { useToast } from '@/composables/useToast'
 import { getApiErrorMessage, getFieldErrors, type FieldErrors } from '@/utils/apiErrors'
 import { computed, onMounted, ref } from 'vue'
@@ -39,6 +40,7 @@ const projectImages = ref<AdminProjectImage[]>([])
 const pendingImages = ref<PendingImage[]>([])
 const showForm = ref(false)
 const fieldErrors = ref<FieldErrors>({})
+const deletingProjectId = ref<number | null>(null)
 
 const form = ref(emptyForm())
 
@@ -184,8 +186,13 @@ const submitProject = async () => {
     }
 }
 
-const removeProject = async (id: number) => {
-    if (!confirm('Excluir este projeto?')) return
+const askRemoveProject = (id: number) => {
+    deletingProjectId.value = id
+}
+
+const removeProjectConfirmed = async () => {
+    const id = deletingProjectId.value
+    if (!id) return
 
     try {
         await deleteAdminProject(id)
@@ -193,6 +200,8 @@ const removeProject = async (id: number) => {
         await loadProjects()
     } catch (error) {
         toast.error(getApiErrorMessage(error, 'Erro ao excluir projeto.'))
+    } finally {
+        deletingProjectId.value = null
     }
 }
 
@@ -442,7 +451,10 @@ onMounted(loadProjects)
                 <button class="btn-primary" @click="openNew">+ Novo Projeto</button>
             </div>
 
-            <div v-if="!projects.length" class="empty">Nenhum projeto cadastrado.</div>
+            <div v-if="!projects.length" class="empty">
+                <strong>Nenhum projeto cadastrado</strong>
+                <p>Use "Novo Projeto" para publicar o primeiro item do portfolio.</p>
+            </div>
 
             <ul class="project-list">
                 <li v-for="project in projects" :key="project.id" class="project-item">
@@ -461,10 +473,20 @@ onMounted(loadProjects)
                     </div>
                     <div class="project-actions">
                         <button @click="openEdit(project)">Editar</button>
-                        <button class="danger" @click="removeProject(project.id)">Excluir</button>
+                        <button class="danger" @click="askRemoveProject(project.id)">Excluir</button>
                     </div>
                 </li>
             </ul>
+
+            <ConfirmDialog
+                :open="deletingProjectId !== null"
+                title="Excluir projeto"
+                message="Esta ação remove o projeto e não pode ser desfeita. Deseja continuar?"
+                confirm-text="Excluir"
+                :danger="true"
+                @confirm="removeProjectConfirmed"
+                @cancel="deletingProjectId = null"
+            />
         </div>
     </div>
 </template>
@@ -474,6 +496,16 @@ onMounted(loadProjects)
 .empty {
     padding: 1rem;
     color: var(--contrast-brown);
+}
+
+.empty {
+    background: color-mix(in srgb, var(--contrast-brown) 10%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--contrast-brown) 25%, transparent);
+    border-radius: 10px;
+}
+
+.empty p {
+    margin: 0.35rem 0 0;
 }
 
 .list-header,

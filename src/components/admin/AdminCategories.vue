@@ -5,6 +5,7 @@ import {
     fetchAdminCategories,
     type AdminCategory,
 } from '@/api/admin'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { useToast } from '@/composables/useToast'
 import { getApiErrorMessage, getFieldErrors, type FieldErrors } from '@/utils/apiErrors'
 import { onMounted, ref } from 'vue'
@@ -15,6 +16,7 @@ const isLoading = ref(true)
 const isSaving = ref(false)
 const form = ref({ name: '', slug: '' })
 const fieldErrors = ref<FieldErrors>({})
+const deletingId = ref<number | null>(null)
 
 const load = async () => {
     isLoading.value = true
@@ -42,14 +44,22 @@ const submit = async () => {
     }
 }
 
-const remove = async (id: number) => {
-    if (!confirm('Excluir esta categoria?')) return
+const askRemove = (id: number) => {
+    deletingId.value = id
+}
+
+const removeConfirmed = async () => {
+    const id = deletingId.value
+    if (!id) return
+
     try {
         await deleteAdminCategory(id)
         categories.value = categories.value.filter(c => c.id !== id)
         toast.success('Categoria excluída.')
     } catch (error) {
         toast.error(getApiErrorMessage(error, 'Erro ao excluir categoria.'))
+    } finally {
+        deletingId.value = null
     }
 }
 
@@ -81,7 +91,10 @@ onMounted(load)
         <p v-if="errorFor('slug')" class="field-error">{{ errorFor('slug') }}</p>
 
         <h3>Categorias cadastradas</h3>
-        <div v-if="!categories.length" class="empty">Nenhuma categoria.</div>
+        <div v-if="!categories.length" class="empty">
+            <strong>Sem categorias</strong>
+            <p>Crie uma categoria para organizar os projetos no portfolio.</p>
+        </div>
 
         <ul class="list">
             <li v-for="cat in categories" :key="cat.id">
@@ -89,9 +102,19 @@ onMounted(load)
                     <strong>{{ cat.name }}</strong>
                     <small>{{ cat.slug }}</small>
                 </div>
-                <button class="danger" @click="remove(cat.id)">Excluir</button>
+                <button class="danger" @click="askRemove(cat.id)">Excluir</button>
             </li>
         </ul>
+
+        <ConfirmDialog
+            :open="deletingId !== null"
+            title="Excluir categoria"
+            message="Os projetos vinculados continuarão existindo, mas sem esta categoria. Deseja continuar?"
+            confirm-text="Excluir"
+            :danger="true"
+            @confirm="removeConfirmed"
+            @cancel="deletingId = null"
+        />
     </div>
 </template>
 
@@ -100,6 +123,16 @@ onMounted(load)
 .empty {
     padding: 1rem;
     color: var(--contrast-brown);
+}
+
+.empty {
+    background: color-mix(in srgb, var(--contrast-brown) 10%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--contrast-brown) 25%, transparent);
+    border-radius: 10px;
+}
+
+.empty p {
+    margin: 0.35rem 0 0;
 }
 
 .field-error {

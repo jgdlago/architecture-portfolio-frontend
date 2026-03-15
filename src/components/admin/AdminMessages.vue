@@ -5,6 +5,7 @@ import {
     markMessageAsRead,
     type AdminMessage,
 } from '@/api/admin'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { useToast } from '@/composables/useToast'
 import { onMounted, ref } from 'vue'
 
@@ -12,6 +13,7 @@ const toast = useToast()
 const messages = ref<AdminMessage[]>([])
 const isLoading = ref(true)
 const expandedId = ref<number | null>(null)
+const deletingId = ref<number | null>(null)
 
 const load = async () => {
     isLoading.value = true
@@ -36,14 +38,22 @@ const setRead = async (msg: AdminMessage) => {
     }
 }
 
-const remove = async (id: number) => {
-    if (!confirm('Excluir esta mensagem?')) return
+const askRemove = (id: number) => {
+    deletingId.value = id
+}
+
+const removeConfirmed = async () => {
+    const id = deletingId.value
+    if (!id) return
+
     try {
         await deleteAdminMessage(id)
         messages.value = messages.value.filter(m => m.id !== id)
         toast.success('Mensagem excluída.')
     } catch {
         toast.error('Erro ao excluir mensagem.')
+    } finally {
+        deletingId.value = null
     }
 }
 
@@ -56,7 +66,10 @@ onMounted(load)
     <div v-else>
         <h2>Mensagens de Contato</h2>
 
-        <div v-if="!messages.length" class="empty">Nenhuma mensagem recebida.</div>
+        <div v-if="!messages.length" class="empty">
+            <strong>Caixa de entrada vazia</strong>
+            <p>Nenhuma mensagem recebida até o momento.</p>
+        </div>
 
         <ul class="message-list">
             <li v-for="msg in messages" :key="msg.id" :class="{ unread: !msg.is_read }" @click="toggleExpand(msg.id)">
@@ -79,12 +92,22 @@ onMounted(load)
                     <p>{{ msg.message }}</p>
                     <div class="msg-actions">
                         <button v-if="!msg.is_read" @click.stop="setRead(msg)">Marcar como lida</button>
-                        <button class="danger" @click.stop="remove(msg.id)">Excluir</button>
+                        <button class="danger" @click.stop="askRemove(msg.id)">Excluir</button>
                     </div>
                 </div>
                 <p v-else class="msg-preview">{{ msg.message.substring(0, 120) }}{{ msg.message.length > 120 ? '...' : '' }}</p>
             </li>
         </ul>
+
+        <ConfirmDialog
+            :open="deletingId !== null"
+            title="Excluir mensagem"
+            message="Esta ação não pode ser desfeita. Deseja realmente excluir esta mensagem?"
+            confirm-text="Excluir"
+            :danger="true"
+            @confirm="removeConfirmed"
+            @cancel="deletingId = null"
+        />
     </div>
 </template>
 
@@ -93,6 +116,16 @@ onMounted(load)
 .empty {
     padding: 1rem;
     color: var(--contrast-brown);
+}
+
+.empty {
+    background: color-mix(in srgb, var(--contrast-brown) 10%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--contrast-brown) 25%, transparent);
+    border-radius: 10px;
+}
+
+.empty p {
+    margin: 0.35rem 0 0;
 }
 
 h2 {

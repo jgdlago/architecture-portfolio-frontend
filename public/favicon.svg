@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Portfolio de Arquitetura">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b4a078"/>
+      <stop offset="100%" stop-color="#8c857a"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#1f1f1f"/>
+  <path d="M12 50L30 14h4l18 36h-7l-4-8H23l-4 8h-7zm14-14h12l-6-13-6 13z" fill="url(#g)"/>
+</svg>

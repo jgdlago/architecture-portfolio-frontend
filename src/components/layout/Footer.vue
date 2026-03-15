@@ -25,11 +25,9 @@
         </div>
 
         <div class="footer-section services">
-          <h4>Serviços</h4>
+          <h4>{{ servicesTitle }}</h4>
           <ul>
-            <li>Projetos Arquitetônicos</li>
-            <li>Interiores</li>
-            <li>Consultoria</li>
+            <li v-for="service in servicesItems" :key="service">{{ service }}</li>
           </ul>
         </div>
       </div>
@@ -54,6 +52,8 @@ withDefaults(
     linkedinUrl?: string
     copyrightText?: string
     cau?: string
+    servicesTitle?: string
+    servicesItems?: string[]
   }>(),
   {
     brandName: 'Iara Tedesco',
@@ -65,6 +65,8 @@ withDefaults(
     linkedinUrl: '#',
     copyrightText: '© 2026 Todos os direitos reservados',
     cau: 'CAU/BR A304967-1',
+    servicesTitle: 'Serviços',
+    servicesItems: () => ['Projetos Arquitetônicos', 'Interiores', 'Consultoria'],
   },
 )
 </script>

@@ -1,8 +1,8 @@
 <template>
   <section class="featured">
     <header class="header">
-      <h2>Projetos Selecionados</h2>
-      <p>Uma curadoria dos trabalhos mais representativos.</p>
+      <h2>{{ title }}</h2>
+      <p>{{ description }}</p>
     </header>
 
     <div class="grid">
@@ -31,9 +31,17 @@ import type { HomeProjectItem } from '@/api/home';
 import { resolveMediaUrl } from '@/api/http';
 import { RouterLink } from 'vue-router';
 
-defineProps<{
-  projects: HomeProjectItem[]
-}>()
+withDefaults(
+  defineProps<{
+    projects: HomeProjectItem[]
+    title?: string
+    description?: string
+  }>(),
+  {
+    title: 'Projetos Selecionados',
+    description: 'Uma curadoria dos trabalhos mais representativos.',
+  },
+)
 </script>
 
 

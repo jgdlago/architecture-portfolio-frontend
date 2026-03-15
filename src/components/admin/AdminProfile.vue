@@ -116,7 +116,7 @@ onMounted(load)
         <template v-else>
             <form class="card" @submit.prevent="submitProfile">
                 <header>
-                    <h2>Perfil do Usuario</h2>
+                    <h2>Perfil do Usuário</h2>
                     <p>Atualize seus dados de acesso do painel administrativo.</p>
                 </header>
 
@@ -140,7 +140,7 @@ onMounted(load)
                     </label>
 
                     <label class="field">
-                        <span>Senha atual (obrigatoria ao mudar e-mail)</span>
+                        <span>Senha atual (obrigatória ao mudar e-mail)</span>
                         <input
                             v-model="profileForm.current_password"
                             type="password"
@@ -158,7 +158,7 @@ onMounted(load)
             <form class="card" @submit.prevent="submitPassword">
                 <header>
                     <h2>Trocar Senha</h2>
-                    <p>Informe sua senha atual para confirmar a alteracao.</p>
+                    <p>Informe sua senha atual para confirmar a alteração.</p>
                 </header>
 
                 <div class="grid">

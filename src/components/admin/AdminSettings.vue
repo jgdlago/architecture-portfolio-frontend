@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { fetchAdminSettings, uploadFile, upsertAdminSetting } from '@/api/admin'
 import { resolveMediaUrl } from '@/api/http'
+import FeaturedProjects from '@/components/home/FeaturedProjects.vue'
 import HeroSection from '@/components/home/HeroSection.vue'
 import Footer from '@/components/layout/Footer.vue'
 import AboutSection from '@/components/sections/AboutSection.vue'
@@ -22,21 +23,29 @@ const isLoading = ref(true)
 const isSaving = ref(false)
 
 const hero = ref({ title: '', subtitle: '', image_path: '' })
+const navbar = ref({ brand_name: '', brand_role: '', home_label: '', projects_label: '', about_label: '', contact_label: '' })
 const about = ref({ text: '', image_path: '' })
 const contact = ref({ title: '', description: '', instagram_url: '', linkedin_url: '', email: '', whatsapp_url: '' })
 const footer = ref({ brand_name: '', brand_subtitle: '', email: '', phone: '', city: '', instagram_url: '', linkedin_url: '', copyright: '', cau: '' })
 const process = ref({ title: '', steps: [] as Array<{ title: string; description: string }> })
 const experience = ref({ title: '', subtitle: '', blocks: [] as Array<{ title: string; items: string[] }> })
+const featuredProjects = ref({ title: '', description: '' })
+const footerServices = ref({ title: 'Serviços', items: [] as string[] })
+const seo = ref({ title: '', description: '' })
 
-const activeSection = ref<'hero' | 'about' | 'contact' | 'footer' | 'process' | 'experience'>('hero')
+const activeSection = ref<'hero' | 'navbar' | 'about' | 'contact' | 'footer' | 'process' | 'experience' | 'featured' | 'footerServices' | 'seo'>('hero')
 const previewTheme = ref<'light' | 'dark'>('light')
 const sectionLabels: Record<typeof activeSection.value, string> = {
     hero: 'Banner Principal',
+    navbar: 'Navegação',
+    featured: 'Projetos Destaque',
     about: 'Sobre',
     process: 'Processo',
     experience: 'Experiência',
     contact: 'Contato',
     footer: 'Rodapé',
+    footerServices: 'Serviços Rodapé',
+    seo: 'SEO',
 }
 
 const load = async () => {
@@ -49,9 +58,17 @@ const load = async () => {
         }, {})
 
         if (map.hero && typeof map.hero === 'object') Object.assign(hero.value, map.hero)
+        if (map.navbar && typeof map.navbar === 'object') Object.assign(navbar.value, map.navbar)
         if (map.about && typeof map.about === 'object') Object.assign(about.value, map.about)
         if (map.contact && typeof map.contact === 'object') Object.assign(contact.value, map.contact)
         if (map.footer && typeof map.footer === 'object') Object.assign(footer.value, map.footer)
+        if (map.featured_projects && typeof map.featured_projects === 'object') Object.assign(featuredProjects.value, map.featured_projects)
+        if (map.footer_services && typeof map.footer_services === 'object') {
+            const footerServicesValue = map.footer_services as { title?: string; items?: string[] }
+            footerServices.value.title = footerServicesValue.title ?? 'Serviços'
+            footerServices.value.items = footerServicesValue.items ?? []
+        }
+        if (map.seo && typeof map.seo === 'object') Object.assign(seo.value, map.seo)
         if (map.process && typeof map.process === 'object') {
             const processValue = map.process as { title?: string; steps?: Array<{ title: string; description: string }> }
             process.value.title = processValue.title ?? ''
@@ -97,6 +114,8 @@ const addBlock = () => experience.value.blocks.push({ title: '', items: [''] })
 const removeBlock = (i: number) => experience.value.blocks.splice(i, 1)
 const addBlockItem = (block: { items: string[] }) => block.items.push('')
 const removeBlockItem = (block: { items: string[] }, i: number) => block.items.splice(i, 1)
+const addFooterService = () => footerServices.value.items.push('')
+const removeFooterService = (i: number) => footerServices.value.items.splice(i, 1)
 
 // Image upload
 const isUploadingAbout = ref(false)
@@ -139,7 +158,7 @@ onMounted(load)
 
     <div v-else class="settings-editor">
         <nav class="section-nav">
-            <button v-for="sec in (['hero', 'about', 'process', 'experience', 'contact', 'footer'] as const)"
+            <button v-for="sec in (['hero', 'navbar', 'featured', 'about', 'process', 'experience', 'contact', 'footer', 'footerServices', 'seo'] as const)"
                 :key="sec" :class="{ active: activeSection === sec }" @click="activeSection = sec">
                 {{ sectionLabels[sec] }}
             </button>
@@ -180,6 +199,52 @@ onMounted(load)
                 <div class="site-preview-shell">
                     <div class="site-preview" :class="{ 'preview-dark': previewTheme === 'dark' }">
                         <HeroSection :title="hero.title || undefined" :subtitle="hero.subtitle || undefined" :background-image="heroPreviewImage" />
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Navbar -->
+        <form v-else-if="activeSection === 'navbar'" class="section-form" @submit.prevent="save('navbar', navbar)">
+            <h2>Navegação</h2>
+            <p class="section-help">Customize marca e rótulos do menu principal.</p>
+            <div class="form-grid">
+                <div class="field"><label>Nome da marca</label><input v-model="navbar.brand_name" /></div>
+                <div class="field"><label>Subtítulo da marca</label><input v-model="navbar.brand_role" /></div>
+                <div class="field"><label>Rótulo Home</label><input v-model="navbar.home_label" /></div>
+                <div class="field"><label>Rótulo Projetos</label><input v-model="navbar.projects_label" /></div>
+                <div class="field"><label>Rótulo Sobre</label><input v-model="navbar.about_label" /></div>
+                <div class="field"><label>Rótulo Contato</label><input v-model="navbar.contact_label" /></div>
+            </div>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Navegação</button>
+        </form>
+
+        <!-- Featured Projects -->
+        <form v-else-if="activeSection === 'featured'" class="section-form"
+            @submit.prevent="save('featured_projects', featuredProjects)">
+            <h2>Projetos em Destaque</h2>
+            <p class="section-help">Defina título e descrição da seção exibida na home.</p>
+            <div class="field">
+                <label>Título</label>
+                <input v-model="featuredProjects.title" />
+            </div>
+            <div class="field">
+                <label>Descrição</label>
+                <textarea v-model="featuredProjects.description" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Projetos Destaque</button>
+
+            <div class="live-preview">
+                <div class="preview-header">
+                    <h3>Preview</h3>
+                    <div class="theme-switch" role="group" aria-label="Tema do preview">
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                    </div>
+                </div>
+                <div class="site-preview-shell">
+                    <div class="site-preview" :class="{ 'preview-dark': previewTheme === 'dark' }">
+                        <FeaturedProjects :projects="[]" :title="featuredProjects.title" :description="featuredProjects.description" />
                     </div>
                 </div>
             </div>
@@ -334,7 +399,7 @@ onMounted(load)
         </form>
 
         <!-- Footer -->
-        <form v-else class="section-form" @submit.prevent="save('footer', footer)">
+        <form v-else-if="activeSection === 'footer'" class="section-form" @submit.prevent="save('footer', footer)">
             <h2>Footer</h2>
             <div class="form-grid">
                 <div class="field"><label>Nome</label><input v-model="footer.brand_name" /></div>
@@ -362,10 +427,49 @@ onMounted(load)
                         <Footer :brand-name="footer.brand_name || undefined" :brand-subtitle="footer.brand_subtitle || undefined"
                             :email="footer.email || undefined" :phone="footer.phone || undefined" :city="footer.city || undefined"
                             :instagram-url="footer.instagram_url || undefined" :linkedin-url="footer.linkedin_url || undefined"
-                            :copyright-text="footer.copyright || undefined" :cau="footer.cau || undefined" />
+                            :copyright-text="footer.copyright || undefined" :cau="footer.cau || undefined"
+                            :services-title="footerServices.title || undefined" :services-items="footerServices.items" />
                     </div>
                 </div>
             </div>
+        </form>
+
+        <!-- Footer Services -->
+        <form v-else-if="activeSection === 'footerServices'" class="section-form"
+            @submit.prevent="save('footer_services', footerServices)">
+            <h2>Serviços no Rodapé</h2>
+            <p class="section-help">Personalize o título e a lista de serviços mostrados no rodapé.</p>
+
+            <div class="field">
+                <label>Título da seção</label>
+                <input v-model="footerServices.title" />
+            </div>
+
+            <div class="repeater">
+                <h3>Itens</h3>
+                <div v-for="(_, i) in footerServices.items" :key="i" class="repeater-item">
+                    <input v-model="footerServices.items[i]" placeholder="Nome do serviço" />
+                    <button type="button" class="btn-remove" @click="removeFooterService(i)">×</button>
+                </div>
+                <button type="button" class="btn-add" @click="addFooterService">+ Adicionar serviço</button>
+            </div>
+
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Serviços do Rodapé</button>
+        </form>
+
+        <!-- SEO -->
+        <form v-else class="section-form" @submit.prevent="save('seo', seo)">
+            <h2>SEO</h2>
+            <p class="section-help">Esses dados são usados no título e descrição da aba do site.</p>
+            <div class="field">
+                <label>Título da página</label>
+                <input v-model="seo.title" maxlength="255" />
+            </div>
+            <div class="field">
+                <label>Meta descrição</label>
+                <textarea v-model="seo.description" rows="3" maxlength="320"></textarea>
+            </div>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar SEO</button>
         </form>
     </div>
 </template>

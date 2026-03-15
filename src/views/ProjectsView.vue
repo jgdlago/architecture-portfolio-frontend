@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { fetchHomeContent } from '@/api/home'
 import { http } from '@/api/http'
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
@@ -17,8 +18,13 @@ const projects = ref<ProjectListItem[]>([])
 const categories = ref<Category[]>([])
 const activeCategory = ref<string | undefined>(undefined)
 const isLoading = ref(true)
+const settings = ref<Record<string, any>>({})
 
 const filteredProjects = computed(() => projects.value)
+const footer = computed(() => settings.value.footer ?? {})
+const footerServices = computed(() => settings.value.footer_services ?? {})
+const navbar = computed(() => settings.value.navbar ?? {})
+const seo = computed(() => settings.value.seo ?? {})
 
 const loadProjects = async (category?: string) => {
   isLoading.value = true
@@ -36,15 +42,36 @@ const setCategory = (slug?: string) => {
 
 onMounted(async () => {
   try {
-    const { data } = await http.get<Category[]>('/project-categories')
-    categories.value = data
+    const [categoriesResponse, homeContent] = await Promise.all([
+      http.get<Category[]>('/project-categories'),
+      fetchHomeContent(),
+    ])
+
+    categories.value = categoriesResponse.data
+    settings.value = homeContent.settings ?? {}
+
+    if (seo.value.title) {
+      document.title = `${seo.value.title} | Projetos`
+    }
+
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription && seo.value.description) {
+      metaDescription.setAttribute('content', seo.value.description)
+    }
   } catch { /* ignore */ }
   await loadProjects()
 })
 </script>
 
 <template>
-  <Navbar />
+  <Navbar
+    :brand-name="navbar.brand_name"
+    :brand-role="navbar.brand_role"
+    :home-label="navbar.home_label"
+    :projects-label="navbar.projects_label"
+    :about-label="navbar.about_label"
+    :contact-label="navbar.contact_label"
+  />
 
   <main class="projects-page">
     <header class="page-header">
@@ -63,7 +90,9 @@ onMounted(async () => {
     <div v-if="isLoading" class="loading">Carregando projetos...</div>
 
     <div v-else-if="!projects.length" class="empty">
-      <p>Nenhum projeto encontrado.</p>
+      <h2>Nenhum projeto publicado</h2>
+      <p>Estamos preparando novos estudos e obras. Volte em breve para conferir as atualizações.</p>
+      <RouterLink to="/" class="empty-cta">Voltar para a Home</RouterLink>
     </div>
 
     <section v-else class="grid">
@@ -87,7 +116,19 @@ onMounted(async () => {
     </section>
   </main>
 
-  <Footer />
+  <Footer
+    :brand-name="footer.brand_name"
+    :brand-subtitle="footer.brand_subtitle"
+    :email="footer.email"
+    :phone="footer.phone"
+    :city="footer.city"
+    :instagram-url="footer.instagram_url"
+    :linkedin-url="footer.linkedin_url"
+    :copyright-text="footer.copyright"
+    :cau="footer.cau"
+    :services-title="footerServices.title"
+    :services-items="footerServices.items"
+  />
 </template>
 
 <style scoped>
@@ -143,6 +184,34 @@ onMounted(async () => {
 .empty {
   padding: 2rem 0;
   color: var(--contrast-brown);
+}
+
+.empty {
+  border: 1px dashed color-mix(in srgb, var(--contrast-brown) 30%, transparent);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 640px;
+}
+
+.empty h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--primary-text);
+}
+
+.empty p {
+  margin: 0.7rem 0 1rem;
+  line-height: 1.6;
+}
+
+.empty-cta {
+  display: inline-block;
+  text-decoration: none;
+  padding: 0.55rem 0.9rem;
+  border-radius: 8px;
+  background: var(--contrast-gold);
+  color: var(--primary-text);
+  font-weight: 600;
 }
 
 .grid {
