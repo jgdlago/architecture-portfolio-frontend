@@ -45,7 +45,7 @@ const sectionLabels: Record<typeof activeSection.value, string> = {
     contact: 'Contato',
     footer: 'Rodapé',
     footerServices: 'Serviços Rodapé',
-    seo: 'SEO',
+    seo: 'Título da Aba',
 }
 
 const load = async () => {
@@ -459,17 +459,17 @@ onMounted(load)
 
         <!-- SEO -->
         <form v-else class="section-form" @submit.prevent="save('seo', seo)">
-            <h2>SEO</h2>
-            <p class="section-help">Esses dados são usados no título e descrição da aba do site.</p>
+            <h2>Título da Aba e Google</h2>
+            <p class="section-help">Preencha como seu site deve aparecer na aba do navegador e em resultados de busca.</p>
             <div class="field">
-                <label>Título da página</label>
+                <label>Nome do site (título)</label>
                 <input v-model="seo.title" maxlength="255" />
             </div>
             <div class="field">
-                <label>Meta descrição</label>
+                <label>Descrição curta do site</label>
                 <textarea v-model="seo.description" rows="3" maxlength="320"></textarea>
             </div>
-            <button type="submit" class="btn-save" :disabled="isSaving">Salvar SEO</button>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Título e Descrição</button>
         </form>
     </div>
 </template>
