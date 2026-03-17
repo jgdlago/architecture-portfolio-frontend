@@ -81,7 +81,7 @@ const selectTab = (tab: typeof activeTab.value) => {
             <header class="content-header">
                 <div class="content-header-row">
                     <h2>{{ navItems.find((item) => item.key === activeTab)?.label }}</h2>
-                    <button class="theme-toggle" @click="toggle" aria-label="Alternar tema">
+                    <button class="theme-toggle" @click="toggle($event)" aria-label="Alternar tema">
                         <SunIcon v-if="isDark" />
                         <MoonIcon v-else />
                     </button>

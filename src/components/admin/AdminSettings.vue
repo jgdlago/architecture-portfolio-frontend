@@ -690,6 +690,8 @@ onMounted(load)
     scrollbar-width: thin;
     scrollbar-color: color-mix(in srgb, var(--contrast-brown) 65%, transparent)
         color-mix(in srgb, var(--background) 88%, black 12%);
+
+    transition: background-color 0.34s ease, color 0.34s ease, border-color 0.34s ease;
 }
 
 .site-preview.preview-dark {
@@ -700,6 +702,23 @@ onMounted(load)
     --accent: #5A6978;
     --hero-text: #ffffff;
     --hero-overlay: rgba(0, 0, 0, 0.65);
+}
+
+.site-preview.preview-dark,
+.site-preview:not(.preview-dark) {
+    animation: preview-theme-fade 0.36s ease-out;
+}
+
+@keyframes preview-theme-fade {
+    0% {
+        opacity: 0.82;
+        transform: scale(0.995);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .site-preview :deep(.hero) {
