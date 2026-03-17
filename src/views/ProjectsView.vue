@@ -3,7 +3,8 @@ import { fetchHomeContent } from '@/api/home'
 import { http } from '@/api/http'
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
-import { computed, onMounted, ref } from 'vue'
+import { useScrollReveal } from '@/composables/useScrollReveal'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { resolveMediaUrl } from '../api/http'
 import { fetchProjects, type ProjectListItem } from '../api/projects'
@@ -25,6 +26,7 @@ const footer = computed(() => settings.value.footer ?? {})
 const footerServices = computed(() => settings.value.footer_services ?? {})
 const navbar = computed(() => settings.value.navbar ?? {})
 const seo = computed(() => settings.value.seo ?? {})
+const { observe } = useScrollReveal()
 
 const loadProjects = async (category?: string) => {
   isLoading.value = true
@@ -60,10 +62,21 @@ onMounted(async () => {
     }
   } catch { /* ignore */ }
   await loadProjects()
+  await nextTick()
+  observe()
 })
+
+watch(
+  () => filteredProjects.value.length,
+  async () => {
+    await nextTick()
+    observe()
+  },
+)
 </script>
 
 <template>
+  <div>
   <Navbar
     :brand-name="navbar.brand_name"
     :brand-role="navbar.brand_role"
@@ -73,13 +86,13 @@ onMounted(async () => {
     :contact-label="navbar.contact_label"
   />
 
-  <main class="projects-page">
-    <header class="page-header">
+  <main class="projects-page container">
+    <header class="page-header reveal-slide-up">
       <h1>Projetos</h1>
       <p>Conheça nossos projetos de arquitetura e design.</p>
     </header>
 
-    <nav v-if="categories.length" class="filters">
+    <nav v-if="categories.length" class="filters reveal-fade">
       <button :class="{ active: !activeCategory }" @click="setCategory(undefined)">Todos</button>
       <button v-for="cat in categories" :key="cat.id" :class="{ active: activeCategory === cat.slug }"
         @click="setCategory(cat.slug)">
@@ -87,7 +100,13 @@ onMounted(async () => {
       </button>
     </nav>
 
-    <div v-if="isLoading" class="loading">Carregando projetos...</div>
+    <section v-if="isLoading" class="loading-grid">
+      <article v-for="index in 6" :key="index" class="skeleton-card">
+        <div class="skeleton skeleton-image" />
+        <div class="skeleton skeleton-text" style="width: 74%; margin-top: 1rem;" />
+        <div class="skeleton skeleton-text" style="width: 50%; margin-top: 0.55rem;" />
+      </article>
+    </section>
 
     <div v-else-if="!projects.length" class="empty">
       <h2>Nenhum projeto publicado</h2>
@@ -96,13 +115,18 @@ onMounted(async () => {
     </div>
 
     <section v-else class="grid">
-      <RouterLink v-for="project in filteredProjects" :key="project.id" :to="`/projects/${project.slug}`"
-        class="card">
+      <RouterLink v-for="(project, index) in filteredProjects" :key="project.id" :to="`/projects/${project.slug}`"
+        class="card reveal-slide-up" :style="{ transitionDelay: `${Math.min(index * 65, 320)}ms` }">
         <div class="card-image">
           <img v-if="project.cover_image_path" :src="resolveMediaUrl(project.cover_image_path)"
             :alt="project.title" />
           <div v-else class="no-image">Sem imagem</div>
           <span v-if="project.category" class="card-category">{{ project.category }}</span>
+
+          <div class="card-overlay">
+            <h3>{{ project.title }}</h3>
+            <span>{{ project.category || 'Projeto' }}</span>
+          </div>
         </div>
         <div class="card-body">
           <h3>{{ project.title }}</h3>
@@ -129,68 +153,76 @@ onMounted(async () => {
     :services-title="footerServices.title"
     :services-items="footerServices.items"
   />
+  </div>
 </template>
 
 <style scoped>
 .projects-page {
-  padding: 6rem 3rem 4rem;
+  padding: var(--space-16) 0 var(--space-12);
   min-height: 60vh;
 }
 
 .page-header {
-  max-width: 600px;
-  margin-bottom: 3rem;
+  max-width: 680px;
+  margin-bottom: var(--space-10);
 }
 
 .page-header h1 {
-  font-size: 1.8rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-family-heading);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 1.07;
 }
 
 .page-header p {
+  margin: 0;
   color: var(--contrast-brown);
-  font-size: 0.95rem;
+  font-size: 1rem;
+  line-height: 1.74;
 }
 
 .filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 2.5rem;
+  gap: 0.6rem;
+  margin-bottom: var(--space-10);
 }
 
 .filters button {
-  border: 1px solid color-mix(in srgb, var(--contrast-brown) 35%, transparent);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 0.4rem 1.2rem;
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
+  padding: 0.45rem 1.1rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  background: transparent;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
   color: var(--primary-text);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .filters button.active,
 .filters button:hover {
-  background: var(--contrast-gold);
-  border-color: var(--contrast-gold);
+  background: color-mix(in srgb, var(--contrast-gold) 78%, white 22%);
+  border-color: color-mix(in srgb, var(--contrast-gold) 70%, transparent);
 }
 
-.loading,
-.empty {
-  padding: 2rem 0;
-  color: var(--contrast-brown);
+.loading-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+.skeleton-card {
+  padding: var(--space-2);
 }
 
 .empty {
-  border: 1px dashed color-mix(in srgb, var(--contrast-brown) 30%, transparent);
-  border-radius: 12px;
-  padding: 2rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
   max-width: 640px;
+  color: var(--contrast-brown);
 }
 
 .empty h2 {
@@ -207,8 +239,8 @@ onMounted(async () => {
 .empty-cta {
   display: inline-block;
   text-decoration: none;
-  padding: 0.55rem 0.9rem;
-  border-radius: 8px;
+  padding: 0.62rem 1rem;
+  border-radius: var(--radius-md);
   background: var(--contrast-gold);
   color: var(--primary-text);
   font-weight: 600;
@@ -216,8 +248,8 @@ onMounted(async () => {
 
 .grid {
   display: grid;
-  gap: 2.5rem;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-8) var(--space-6);
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
 }
 
 .card {
@@ -229,23 +261,25 @@ onMounted(async () => {
 .card-image {
   position: relative;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .card-image img {
   width: 100%;
-  height: 260px;
+  aspect-ratio: 3 / 2;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.7s ease, filter var(--transition-base);
 }
 
 .card:hover .card-image img {
-  transform: scale(1.04);
+  transform: scale(1.08);
+  filter: brightness(0.72);
 }
 
 .no-image {
   width: 100%;
-  height: 260px;
+  aspect-ratio: 3 / 2;
   display: grid;
   place-items: center;
   background: color-mix(in srgb, var(--contrast-brown) 15%, transparent);
@@ -263,7 +297,39 @@ onMounted(async () => {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   padding: 0.25rem 0.6rem;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  opacity: 0;
+  background: linear-gradient(0deg, rgba(14, 11, 8, 0.78) 0%, rgba(14, 11, 8, 0.1) 55%, transparent 100%);
+  transition: opacity var(--transition-base);
+}
+
+.card-overlay h3 {
+  margin: 0;
+  font-family: var(--font-family-heading);
+  font-size: 1.45rem;
+  line-height: 1.08;
+  color: #f5f1e9;
+}
+
+.card-overlay span {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--contrast-gold) 82%, white 18%);
+}
+
+.card:hover .card-overlay {
+  opacity: 1;
 }
 
 .card-body {
@@ -271,7 +337,7 @@ onMounted(async () => {
 }
 
 .card-body h3 {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 500;
   margin: 0 0 0.3rem;
 }
@@ -286,19 +352,31 @@ onMounted(async () => {
 .card-meta {
   display: flex;
   gap: 1rem;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--contrast-gold);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .loading-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
   .projects-page {
-    padding: 4rem 1.5rem 3rem;
+    padding: var(--space-12) 0 var(--space-10);
   }
 
+  .loading-grid,
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .card-overlay {
+    opacity: 1;
+    padding: var(--space-5);
   }
 }
 </style>

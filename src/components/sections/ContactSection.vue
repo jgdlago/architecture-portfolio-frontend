@@ -2,6 +2,7 @@
 import InstagramIcon from '@/assets/icons/instagram.svg?component';
 import LinkedInIcon from '@/assets/icons/linkedin.svg?component';
 import WhatsAppIcon from '@/assets/icons/whatsapp.svg?component';
+import { useScrollReveal } from '@/composables/useScrollReveal';
 import { useToast } from '@/composables/useToast';
 import { getApiErrorMessage } from '@/utils/apiErrors';
 import { EnvelopeIcon } from '@heroicons/vue/24/outline';
@@ -77,19 +78,20 @@ const sendEmail = async () => {
     isSubmitting.value = false
   }
 }
+
+useScrollReveal()
 </script>
 
 <template>
-  <section class="contact">
-    <header>
+  <section class="contact container">
+    <header class="reveal-slide-up">
       <h2>{{ title }}</h2>
       <p>{{ description }}</p>
     </header>
 
     <div class="blocks">
 
-      <!-- Formulário -->
-      <div class="block form-block">
+      <div class="block form-block reveal-slide-up">
         <span class="form-title">Envie uma mensagem</span>
         <form @submit.prevent="sendEmail" class="contact-form">
           <input v-model="form.name" type="text" placeholder="Nome" required />
@@ -102,8 +104,7 @@ const sendEmail = async () => {
         </form>
       </div>
 
-      <!-- Redes sociais -->
-      <div class="block socials-block">
+      <div class="block socials-block reveal-slide-up" style="transition-delay: 90ms;">
         <h3>Redes sociais</h3>
         <ul>
           <li>
@@ -139,99 +140,114 @@ const sendEmail = async () => {
 
 <style scoped>
 .contact {
-  padding: 6rem 3rem;
+  padding: var(--space-20) 0;
   background-color: var(--background);
   color: var(--primary-text);
 }
 
 .contact header {
   max-width: 600px;
-  margin-bottom: 4rem;
+  margin-bottom: var(--space-10);
 }
 
 .contact h2 {
-  font-size: 1.5rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  margin-bottom: 1rem;
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-family-heading);
+  font-size: clamp(2rem, 4.3vw, 3rem);
+  line-height: 1.1;
 }
 
 .contact p {
-  font-size: 0.95rem;
+  margin: 0;
+  font-size: 1rem;
   color: var(--contrast-brown);
   line-height: 1.8;
 }
 
-/* Grid de blocos */
 .blocks {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 4rem;
+  gap: var(--space-10);
 }
 
-/* Formulário */
 .form-block .form-title {
-  font-size: 0.95rem;
-  letter-spacing: 0.15em;
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--contrast-brown);
-  margin-bottom: 1rem;
 }
 
 .contact-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  background-color: color-mix(in srgb, var(--background) 90%, var(--contrast-brown) 10%);
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+  gap: var(--space-4);
+  background-color: color-mix(in srgb, var(--surface-elevated) 92%, transparent);
+  padding: var(--space-8);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
 }
 
 .contact-form input,
 .contact-form textarea {
-  padding: 0.9rem 1rem;
-  border: 1px solid var(--contrast-brown);
-  border-radius: 6px;
-  background-color: var(--background);
+  padding: 0.88rem 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--contrast-brown) 36%, transparent);
+  border-radius: var(--radius-md);
+  background-color: color-mix(in srgb, var(--background) 95%, transparent);
   color: var(--primary-text);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
 
 .contact-form input::placeholder,
 .contact-form textarea::placeholder {
-  color: var(--contrast-brown);
+  color: color-mix(in srgb, var(--contrast-brown) 86%, transparent);
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: color-mix(in srgb, var(--contrast-gold) 70%, var(--border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--contrast-gold) 18%, transparent);
+  outline: none;
 }
 
 .contact-form button {
   align-self: flex-start;
-  padding: 0.8rem 2rem;
-  background-color: var(--contrast-gold);
+  padding: 0.78rem 1.8rem;
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--contrast-gold) 84%, white 16%),
+    color-mix(in srgb, var(--contrast-gold) 66%, var(--contrast-brown) 34%)
+  );
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   color: var(--primary-text);
   font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.74rem;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: transform var(--transition-fast), filter var(--transition-fast);
 }
 
 .contact-form button:hover {
-  background-color: var(--contrast-brown);
   transform: translateY(-2px);
+  filter: brightness(1.05);
 }
 
 .form-error {
   margin: 0;
-  color: #c0392b;
+  color: #b83333;
   font-size: 0.82rem;
 }
 
-/* Redes sociais */
 .socials-block h3 {
-  font-size: 0.9rem;
+  margin: 0 0 var(--space-6);
+  font-size: 0.86rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  margin-bottom: 1.5rem;
+  color: var(--contrast-gold);
 }
 
 .socials-block ul {
@@ -246,36 +262,46 @@ const sendEmail = async () => {
 .social-link {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 1rem;
   text-decoration: none;
   color: var(--primary-text);
-  transition: transform 0.2s ease;
+  transition: transform var(--transition-fast);
 }
 
 .social-link .icon {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   color: var(--primary-text);
-  transition: color 0.3s ease, transform 0.2s ease;
+  transition: color var(--transition-fast), transform var(--transition-fast);
 }
 
 .social-link:hover .icon,
 .social-link:hover span {
   color: var(--contrast-gold);
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .socials-block span {
-  font-size: 0.95rem;
-  letter-spacing: 0.15em;
+  font-size: 0.88rem;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--contrast-brown);
 }
 
-/* Responsivo */
 @media (max-width: 1024px) {
   .blocks {
     grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+}
+
+@media (max-width: 640px) {
+  .contact {
+    padding: var(--space-16) 0;
+  }
+
+  .contact-form {
+    padding: var(--space-6);
   }
 }
 </style>

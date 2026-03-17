@@ -121,14 +121,14 @@ onMounted(load)
 <style scoped>
 .loading,
 .empty {
-    padding: 1rem;
+    padding: var(--space-5);
     color: var(--contrast-brown);
 }
 
 .empty {
-    background: color-mix(in srgb, var(--contrast-brown) 10%, transparent);
-    border: 1px dashed color-mix(in srgb, var(--contrast-brown) 25%, transparent);
-    border-radius: 10px;
+    background: color-mix(in srgb, var(--surface) 95%, transparent);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
 }
 
 .empty p {
@@ -144,7 +144,7 @@ onMounted(load)
 .inline-form {
     display: flex;
     gap: 0.6rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-6);
     flex-wrap: wrap;
 }
 
@@ -152,9 +152,9 @@ onMounted(load)
     flex: 1;
     min-width: 150px;
     padding: 0.6rem 0.8rem;
-    border-radius: 6px;
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 40%, transparent);
-    background: var(--background);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 95%, transparent);
     color: var(--primary-text);
 }
 
@@ -170,8 +170,9 @@ button {
 }
 
 h2 {
-    font-size: 1rem;
-    margin: 0 0 0.8rem;
+    margin: 0 0 var(--space-4);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.4rem, 3vw, 2rem);
 }
 
 h3 {
@@ -195,9 +196,11 @@ h3 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.6rem 0.8rem;
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
-    border-radius: 6px;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    box-shadow: var(--shadow-sm);
 }
 
 .list small {

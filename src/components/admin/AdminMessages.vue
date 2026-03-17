@@ -114,14 +114,14 @@ onMounted(load)
 <style scoped>
 .loading,
 .empty {
-    padding: 1rem;
+    padding: var(--space-5);
     color: var(--contrast-brown);
 }
 
 .empty {
-    background: color-mix(in srgb, var(--contrast-brown) 10%, transparent);
-    border: 1px dashed color-mix(in srgb, var(--contrast-brown) 25%, transparent);
-    border-radius: 10px;
+    background: color-mix(in srgb, var(--surface) 95%, transparent);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
 }
 
 .empty p {
@@ -129,8 +129,9 @@ onMounted(load)
 }
 
 h2 {
-    font-size: 1rem;
-    margin: 0 0 1rem;
+    margin: 0 0 var(--space-5);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.4rem, 3vw, 2rem);
 }
 
 .message-list {
@@ -139,19 +140,23 @@ h2 {
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--space-3);
 }
 
 .message-list li {
-    padding: 0.8rem;
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
-    border-radius: 8px;
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--surface) 95%, transparent);
+    box-shadow: var(--shadow-sm);
     cursor: pointer;
-    transition: border-color 0.2s;
+    transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .message-list li:hover {
-    border-color: color-mix(in srgb, var(--contrast-brown) 40%, transparent);
+    border-color: color-mix(in srgb, var(--contrast-brown) 42%, transparent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .message-list li.unread {
@@ -202,7 +207,7 @@ h2 {
 }
 
 .unread-badge {
-    background: color-mix(in srgb, var(--contrast-gold) 25%, transparent);
+    background: color-mix(in srgb, var(--contrast-gold) 32%, transparent);
     color: var(--contrast-gold);
 }
 
@@ -241,7 +246,7 @@ h2 {
 
 .msg-actions button {
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     padding: 0.4rem 0.8rem;
     font-size: 0.8rem;
     background: var(--contrast-gold);

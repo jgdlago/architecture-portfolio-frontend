@@ -476,7 +476,7 @@ onMounted(load)
 
 <style scoped>
 .loading {
-    padding: 1rem;
+    padding: var(--space-5);
     color: var(--contrast-brown);
 }
 
@@ -489,38 +489,48 @@ onMounted(load)
 .section-nav {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.45rem;
 }
 
 .section-nav button {
-    border: none;
-    border-radius: 6px;
-    padding: 0.45rem 0.8rem;
-    font-size: 0.8rem;
-    background: color-mix(in srgb, var(--contrast-brown) 20%, transparent);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0.84rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: color-mix(in srgb, var(--surface) 95%, transparent);
     color: var(--primary-text);
     cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .section-nav button.active {
-    background: var(--contrast-gold);
+    background: color-mix(in srgb, var(--contrast-gold) 24%, transparent);
+    border-color: color-mix(in srgb, var(--contrast-gold) 55%, transparent);
+}
+
+.section-nav button:hover {
+    transform: translateY(-1px);
 }
 
 .section-form {
-    background: color-mix(in srgb, var(--background) 93%, black 7%);
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
-    border-radius: 10px;
-    padding: 1.2rem;
+    background: color-mix(in srgb, var(--surface-elevated) 95%, black 5%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
 }
 
 .section-form h2 {
-    margin: 0 0 1rem;
-    font-size: 1rem;
+    margin: 0 0 var(--space-4);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.35rem, 3vw, 1.9rem);
 }
 
 .section-help {
-    margin: -0.4rem 0 1rem;
-    font-size: 0.82rem;
+    margin: -0.15rem 0 var(--space-4);
+    font-size: 0.84rem;
     color: var(--contrast-brown);
 }
 
@@ -546,19 +556,23 @@ onMounted(load)
 .field input,
 .field textarea {
     width: 100%;
-    padding: 0.55rem 0.7rem;
-    border-radius: 6px;
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 40%, transparent);
-    background: var(--background);
+    padding: 0.62rem 0.72rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
     color: var(--primary-text);
 }
 
 .btn-save {
     margin-top: 0.8rem;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     padding: 0.6rem 1.2rem;
-    background: var(--contrast-gold);
+    background: linear-gradient(
+        120deg,
+        color-mix(in srgb, var(--contrast-gold) 84%, white 16%),
+        color-mix(in srgb, var(--contrast-gold) 68%, var(--contrast-brown) 32%)
+    );
     color: var(--primary-text);
     font-weight: 600;
     cursor: pointer;
@@ -609,10 +623,10 @@ onMounted(load)
 }
 
 .site-preview-shell {
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 24%, transparent);
-    border-radius: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    background: color-mix(in srgb, var(--background) 96%, black 4%);
+    background: color-mix(in srgb, var(--surface) 96%, black 4%);
 }
 
 .site-preview {
@@ -708,8 +722,8 @@ onMounted(load)
 }
 
 .repeater-block {
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
-    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
     padding: 0.6rem;
     margin-bottom: 0.5rem;
 }

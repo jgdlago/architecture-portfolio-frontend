@@ -3,6 +3,7 @@ import { fetchAboutContent, type AboutPayload } from '@/api/about'
 import { resolveMediaUrl } from '@/api/http'
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
+import { useScrollReveal } from '@/composables/useScrollReveal'
 import { computed, onMounted, ref } from 'vue'
 
 const about = ref<AboutPayload | null>(null)
@@ -24,6 +25,7 @@ const city = computed(() => about.value?.profile?.city ? `${about.value.profile.
 const yearsExperience = computed(() => about.value?.profile?.years_experience)
 const cau = computed(() => about.value?.user?.cau)
 const experiences = computed(() => about.value?.experiences ?? [])
+useScrollReveal()
 
 function formatDate(date: string): string {
   const [year, month] = date.split('-')
@@ -33,14 +35,14 @@ function formatDate(date: string): string {
 </script>
 
 <template>
+  <div>
   <Navbar />
 
-  <main class="about-page">
+  <main class="about-page container">
     <div v-if="isLoading" class="loading">Carregando...</div>
 
     <template v-else-if="about">
-      <!-- Hero area -->
-      <section class="about-hero">
+      <section class="about-hero reveal-slide-up">
         <div v-if="avatarUrl" class="avatar">
           <img :src="avatarUrl" :alt="displayName" />
         </div>
@@ -56,16 +58,14 @@ function formatDate(date: string): string {
         </div>
       </section>
 
-      <!-- Bio -->
-      <section v-if="bio" class="bio">
+      <section v-if="bio" class="bio reveal-slide-up">
         <p>{{ bio }}</p>
       </section>
 
-      <!-- Experiences -->
-      <section v-if="experiences.length" class="experiences">
+      <section v-if="experiences.length" class="experiences reveal-slide-up">
         <h2>Experiência Profissional</h2>
         <div class="timeline">
-          <div v-for="exp in experiences" :key="exp.id" class="timeline-item">
+          <div v-for="(exp, index) in experiences" :key="exp.id" class="timeline-item reveal-slide-left" :style="{ transitionDelay: `${Math.min(index * 70, 280)}ms` }">
             <div class="timeline-dot" />
             <div class="timeline-content">
               <h3>{{ exp.title }}</h3>
@@ -82,13 +82,13 @@ function formatDate(date: string): string {
   </main>
 
   <Footer />
+  </div>
 </template>
 
 <style scoped>
 .about-page {
-  padding: 4rem 3rem;
-  max-width: 900px;
-  margin: 0 auto;
+  padding: var(--space-16) 0 var(--space-12);
+  max-width: var(--container-md);
 }
 
 .loading {
@@ -97,12 +97,11 @@ function formatDate(date: string): string {
   color: var(--contrast-brown);
 }
 
-/* Hero */
 .about-hero {
   display: flex;
-  gap: 3rem;
+  gap: var(--space-10);
   align-items: center;
-  margin-bottom: 4rem;
+  margin-bottom: var(--space-12);
 }
 
 .avatar {
@@ -110,24 +109,26 @@ function formatDate(date: string): string {
 }
 
 .avatar img {
-  width: 180px;
-  height: 180px;
+  width: 210px;
+  height: 210px;
   border-radius: 50%;
   object-fit: cover;
-  filter: grayscale(60%);
+  filter: grayscale(20%);
+  border: 2px solid color-mix(in srgb, var(--contrast-gold) 62%, transparent);
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--contrast-gold) 12%, transparent);
 }
 
 .hero-text h1 {
-  font-size: 2rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
+  font-family: var(--font-family-heading);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.05;
   margin: 0 0 0.4rem;
 }
 
 .headline {
-  font-size: 1rem;
+  font-size: 1.06rem;
   color: var(--contrast-gold);
-  margin: 0 0 1rem;
+  margin: 0 0 var(--space-4);
 }
 
 .info-tags {
@@ -137,37 +138,36 @@ function formatDate(date: string): string {
 }
 
 .info-tags span {
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--contrast-brown);
-  padding: 0.3rem 0.8rem;
-  border: 1px solid color-mix(in srgb, var(--contrast-brown) 25%, transparent);
+  padding: 0.4rem 0.82rem;
+  border: 1px solid var(--border);
   border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
 }
 
-/* Bio */
 .bio {
-  margin-bottom: 4rem;
+  margin-bottom: var(--space-12);
 }
 
 .bio p {
+  margin: 0;
   font-size: 1.05rem;
-  line-height: 1.9;
+  line-height: 1.95;
   color: var(--contrast-brown);
 }
 
-/* Experiences timeline */
 .experiences h2 {
-  font-size: 1rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: 2rem;
+  margin: 0 0 var(--space-8);
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.7rem, 3.8vw, 2.3rem);
 }
 
 .timeline {
   position: relative;
-  padding-left: 2rem;
+  padding-left: 2.4rem;
 }
 
 .timeline::before {
@@ -182,7 +182,7 @@ function formatDate(date: string): string {
 
 .timeline-item {
   position: relative;
-  padding-bottom: 2rem;
+  padding: 0.2rem 0 2rem;
 }
 
 .timeline-item:last-child {
@@ -191,10 +191,10 @@ function formatDate(date: string): string {
 
 .timeline-dot {
   position: absolute;
-  left: -2rem;
+  left: -2.4rem;
   top: 0.3rem;
-  width: 13px;
-  height: 13px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   border: 2px solid var(--contrast-gold);
   background: var(--background);
@@ -202,15 +202,15 @@ function formatDate(date: string): string {
 }
 
 .timeline-content h3 {
-  font-size: 1rem;
+  margin: 0;
+  font-size: 1.08rem;
   font-weight: 500;
-  margin: 0 0 0.2rem;
 }
 
 .company {
   font-size: 0.9rem;
   color: var(--contrast-brown);
-  margin: 0 0 0.3rem;
+  margin: 0.15rem 0 0.35rem;
 }
 
 .period {
@@ -220,19 +220,33 @@ function formatDate(date: string): string {
   color: var(--contrast-gold);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .about-page {
-    padding: 3rem 1.5rem;
+    padding: var(--space-12) 0 var(--space-10);
   }
 
   .about-hero {
     flex-direction: column;
     text-align: center;
-    gap: 1.5rem;
+    gap: var(--space-6);
+    margin-bottom: var(--space-10);
+  }
+
+  .avatar img {
+    width: 170px;
+    height: 170px;
   }
 
   .info-tags {
     justify-content: center;
+  }
+
+  .timeline {
+    padding-left: 1.7rem;
+  }
+
+  .timeline-dot {
+    left: -1.7rem;
   }
 }
 </style>
