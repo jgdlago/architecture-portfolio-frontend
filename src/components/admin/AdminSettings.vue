@@ -192,8 +192,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -238,8 +238,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -273,8 +273,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -308,8 +308,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -353,8 +353,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -384,8 +384,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -418,8 +418,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -611,8 +611,10 @@ onMounted(load)
     border: none;
     background: transparent;
     color: var(--contrast-brown);
-    font-size: 0.72rem;
-    padding: 0.3rem 0.65rem;
+    font-size: 0.95rem;
+    line-height: 1;
+    min-width: 2.1rem;
+    padding: 0.38rem 0.5rem;
     cursor: pointer;
 }
 
@@ -620,6 +622,18 @@ onMounted(load)
     background: var(--contrast-gold);
     color: var(--primary-text);
     font-weight: 700;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .site-preview-shell {
@@ -823,3 +837,5 @@ onMounted(load)
     }
 }
 </style>
+
+
