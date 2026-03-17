@@ -25,7 +25,15 @@ const isSaving = ref(false)
 const hero = ref({ title: '', subtitle: '', image_path: '' })
 const navbar = ref({ brand_name: '', brand_role: '', home_label: '', projects_label: '', about_label: '', contact_label: '' })
 const about = ref({ text: '', image_path: '' })
-const contact = ref({ title: '', description: '', instagram_url: '', linkedin_url: '', email: '', whatsapp_url: '' })
+const contact = ref({
+    title: '',
+    description: '',
+    instagram_url: '',
+    linkedin_url: '',
+    email: '',
+    whatsapp_number: '',
+    whatsapp_message: '',
+})
 const footer = ref({ brand_name: '', brand_subtitle: '', email: '', phone: '', city: '', instagram_url: '', linkedin_url: '', copyright: '', cau: '' })
 const process = ref({ title: '', steps: [] as Array<{ title: string; description: string }> })
 const experience = ref({ title: '', subtitle: '', blocks: [] as Array<{ title: string; items: string[] }> })
@@ -374,7 +382,8 @@ onMounted(load)
                 <div class="field"><label>Título</label><input v-model="contact.title" /></div>
                 <div class="field"><label>Descrição</label><input v-model="contact.description" /></div>
                 <div class="field"><label>Email</label><input v-model="contact.email" type="email" /></div>
-                <div class="field"><label>WhatsApp URL</label><input v-model="contact.whatsapp_url" /></div>
+                <div class="field"><label>Número WhatsApp</label><input v-model="contact.whatsapp_number" placeholder="Ex.: 5551999999999" /></div>
+                <div class="field"><label>Mensagem WhatsApp</label><input v-model="contact.whatsapp_message" placeholder="Olá! Gostaria de falar sobre um projeto." /></div>
                 <div class="field"><label>Instagram URL</label><input v-model="contact.instagram_url" /></div>
                 <div class="field"><label>LinkedIn URL</label><input v-model="contact.linkedin_url" /></div>
             </div>
@@ -392,7 +401,9 @@ onMounted(load)
                     <div class="site-preview" :class="{ 'preview-dark': previewTheme === 'dark' }">
                         <ContactSection :title="contact.title || undefined" :description="contact.description || undefined"
                             :instagram-url="contact.instagram_url || undefined" :linkedin-url="contact.linkedin_url || undefined"
-                            :email="contact.email || undefined" :whatsapp-url="contact.whatsapp_url || undefined" />
+                            :email="contact.email || undefined"
+                            :whatsapp-number="contact.whatsapp_number || undefined"
+                            :whatsapp-message="contact.whatsapp_message || undefined" />
                     </div>
                 </div>
             </div>

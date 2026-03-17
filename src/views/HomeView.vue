@@ -94,7 +94,8 @@ onMounted(async () => {
       :instagram-url="contact.instagram_url"
       :linkedin-url="contact.linkedin_url"
       :email="contact.email"
-      :whatsapp-url="contact.whatsapp_url"
+      :whatsapp-number="contact.whatsapp_number"
+      :whatsapp-message="contact.whatsapp_message"
     />
   </div>
 

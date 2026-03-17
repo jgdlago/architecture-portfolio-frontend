@@ -6,7 +6,7 @@ import { useScrollReveal } from '@/composables/useScrollReveal';
 import { useToast } from '@/composables/useToast';
 import { getApiErrorMessage } from '@/utils/apiErrors';
 import { EnvelopeIcon } from '@heroicons/vue/24/outline';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { http } from '../../api/http';
 
 interface Form {
@@ -25,14 +25,15 @@ const isSubmitting = ref(false)
 const toast = useToast()
 const formError = ref('')
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     title?: string
     description?: string
     instagramUrl?: string
     linkedinUrl?: string
     email?: string
-    whatsappUrl?: string
+    whatsappNumber?: string
+    whatsappMessage?: string
   }>(),
   {
     title: 'Contato',
@@ -40,9 +41,22 @@ withDefaults(
     instagramUrl: 'https://www.instagram.com/',
     linkedinUrl: 'https://www.linkedin.com/',
     email: 'email@dominio.com',
-    whatsappUrl: '#',
+    whatsappNumber: '',
+    whatsappMessage: '',
   },
 )
+
+const whatsappHref = computed(() => {
+  const cleanNumber = (props.whatsappNumber ?? '').replace(/\D/g, '')
+
+  if (cleanNumber.length > 0) {
+    const base = `https://wa.me/${cleanNumber}`
+    const message = (props.whatsappMessage ?? '').trim()
+    return message.length > 0 ? `${base}?text=${encodeURIComponent(message)}` : base
+  }
+
+  return '#'
+})
 
 const sendEmail = async () => {
   if (isSubmitting.value) {
@@ -85,8 +99,8 @@ useScrollReveal()
 <template>
   <section class="contact container">
     <header class="reveal-slide-up">
-      <h2>{{ title }}</h2>
-      <p>{{ description }}</p>
+      <h2>{{ props.title }}</h2>
+      <p>{{ props.description }}</p>
     </header>
 
     <div class="blocks">
@@ -108,25 +122,25 @@ useScrollReveal()
         <h3>Redes sociais</h3>
         <ul>
           <li>
-            <a :href="instagramUrl" target="_blank" class="social-link" aria-label="Instagram">
+            <a :href="props.instagramUrl" target="_blank" class="social-link" aria-label="Instagram">
               <InstagramIcon class="icon" />
               <span>Instagram</span>
             </a>
           </li>
           <li>
-            <a :href="linkedinUrl" target="_blank" class="social-link" aria-label="LinkedIn">
+            <a :href="props.linkedinUrl" target="_blank" class="social-link" aria-label="LinkedIn">
               <LinkedInIcon class="icon" />
               <span>LinkedIn</span>
             </a>
           </li>
           <li>
-            <a :href="`mailto:${email}`" class="social-link" aria-label="E-mail">
+            <a :href="`mailto:${props.email}`" class="social-link" aria-label="E-mail">
               <EnvelopeIcon class="icon" />
               <span>E-mail</span>
             </a>
           </li>
           <li>
-            <a :href="whatsappUrl" target="_blank" class="social-link" aria-label="WhatsApp">
+            <a :href="whatsappHref" target="_blank" class="social-link" aria-label="WhatsApp">
               <WhatsAppIcon class="icon" />
               <span>WhatsApp</span>
             </a>
