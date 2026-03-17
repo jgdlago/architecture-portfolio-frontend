@@ -6,7 +6,11 @@ usePageTracking()
 </script>
 
 <template>
-  <RouterView />
+  <RouterView v-slot="{ Component, route }">
+    <Transition name="page-fade" mode="out-in">
+      <component :is="Component" :key="route.path" />
+    </Transition>
+  </RouterView>
   <ToastContainer />
 </template>
 
@@ -17,5 +21,16 @@ body {
   font-family: var(--font-family-base);
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
+}
+
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.24s ease, transform 0.24s ease;
+}
+
+.page-fade-enter-from,
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
 }
 </style>

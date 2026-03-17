@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
+import { useScrollReveal } from '@/composables/useScrollReveal'
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import axios from 'axios'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { resolveMediaUrl } from '../api/http'
 import { fetchProjectBySlug, type ProjectDetail } from '../api/projects'
@@ -14,6 +15,7 @@ const isLoading = ref(true)
 const loadError = ref(false)
 
 const slug = computed(() => String(route.params.slug || ''))
+const { observe } = useScrollReveal()
 
 // Lightbox state
 const lightboxOpen = ref(false)
@@ -86,8 +88,18 @@ onMounted(async () => {
     }
   } finally {
     isLoading.value = false
+    await nextTick()
+    observe()
   }
 })
+
+watch(
+  () => project.value?.id,
+  async () => {
+    await nextTick()
+    observe()
+  },
+)
 
 onUnmounted(() => {
   document.removeEventListener('keydown', onKeydown)
@@ -95,26 +107,31 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <div>
   <Navbar />
 
   <main class="project-detail">
-    <div v-if="isLoading" class="loading">Carregando projeto...</div>
+    <section v-if="isLoading" class="project-loading container">
+      <div class="skeleton skeleton-image" style="min-height: 420px;" />
+      <div class="skeleton skeleton-text" style="width: 42%; margin-top: 1.3rem;" />
+      <div class="skeleton skeleton-text" style="width: 88%; margin-top: 0.8rem;" />
+      <div class="skeleton skeleton-text" style="width: 78%; margin-top: 0.55rem;" />
+    </section>
 
     <template v-else-if="project">
-      <!-- Back link -->
-      <RouterLink to="/projects" class="back-link">
-        <ArrowLeftIcon class="back-icon" />
-        Voltar aos projetos
-      </RouterLink>
+      <div class="container">
+        <RouterLink to="/projects" class="back-link reveal-fade">
+          <ArrowLeftIcon class="back-icon" />
+          Voltar aos projetos
+        </RouterLink>
+      </div>
 
-      <!-- Hero image -->
-      <div v-if="allImages.length" class="hero-image" @click="openLightbox(0)">
+      <div v-if="allImages.length" class="hero-image reveal-fade" @click="openLightbox(0)">
         <img :src="resolveMediaUrl(allImages[0]!.image_path)" :alt="allImages[0]!.alt_text || project.title" />
       </div>
 
-      <!-- Content grid -->
-      <div class="content-grid">
-        <div class="content-main">
+      <div class="content-grid container">
+        <div class="content-main reveal-slide-up">
           <header>
             <span v-if="project.category" class="category-badge">{{ project.category.name }}</span>
             <h1>{{ project.title }}</h1>
@@ -124,7 +141,7 @@ onUnmounted(() => {
           <p v-else-if="project.short_description" class="description">{{ project.short_description }}</p>
         </div>
 
-        <aside class="content-meta">
+        <aside class="content-meta reveal-slide-up" style="transition-delay: 100ms;">
           <dl>
             <template v-if="project.location">
               <dt>Local</dt>
@@ -150,8 +167,7 @@ onUnmounted(() => {
         </aside>
       </div>
 
-      <!-- Gallery grid -->
-      <section v-if="allImages.length > 1" class="gallery">
+      <section v-if="allImages.length > 1" class="gallery container reveal-slide-up">
         <h2>Galeria</h2>
         <div class="gallery-grid">
           <button
@@ -197,35 +213,33 @@ onUnmounted(() => {
       </Teleport>
     </template>
 
-    <div v-else-if="loadError" class="not-found">
+    <div v-else-if="loadError" class="not-found container">
       <p>Não foi possível carregar o projeto no momento.</p>
       <RouterLink to="/projects" class="back-link">Voltar para projetos</RouterLink>
     </div>
 
-    <div v-else class="not-found">
+    <div v-else class="not-found container">
       <p>Projeto não encontrado.</p>
       <RouterLink to="/projects" class="back-link">Ver todos os projetos</RouterLink>
     </div>
   </main>
 
   <Footer />
+  </div>
 </template>
 
 <style scoped>
 .project-detail {
-  padding: 2rem 3rem 4rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: var(--space-8) 0 var(--space-16);
 }
 
-.loading,
+.project-loading,
 .not-found {
-  padding: 4rem 0;
+  padding: var(--space-10) 0;
   text-align: center;
   color: var(--contrast-brown);
 }
 
-/* Back link */
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -235,7 +249,7 @@ onUnmounted(() => {
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-6);
   transition: color 0.2s;
 }
 
@@ -248,36 +262,35 @@ onUnmounted(() => {
   height: 16px;
 }
 
-/* Hero image */
 .hero-image {
   width: 100%;
   overflow: hidden;
-  border-radius: 4px;
-  margin-bottom: 3rem;
+  margin-bottom: var(--space-12);
   cursor: pointer;
+  box-shadow: var(--shadow-xl);
 }
 
 .hero-image img {
   width: 100%;
-  max-height: 560px;
+  min-height: clamp(320px, 52vw, 620px);
+  max-height: 640px;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.7s ease;
 }
 
 .hero-image:hover img {
   transform: scale(1.02);
 }
 
-/* Content grid */
 .content-grid {
   display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 4rem;
-  margin-bottom: 4rem;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: var(--space-12);
+  margin-bottom: var(--space-12);
 }
 
 .content-main header {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6);
 }
 
 .category-badge {
@@ -293,22 +306,27 @@ onUnmounted(() => {
 }
 
 .content-main h1 {
-  font-size: 2rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  line-height: 1.3;
+  margin: 0;
+  font-family: var(--font-family-heading);
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.04;
 }
 
 .description {
+  margin: 0;
   font-size: 1rem;
-  line-height: 1.8;
+  line-height: 1.85;
   color: var(--contrast-brown);
 }
 
-/* Meta sidebar */
 .content-meta dl {
   display: grid;
   gap: 0;
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface) 93%, transparent);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 .content-meta dt {
@@ -316,7 +334,7 @@ onUnmounted(() => {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--contrast-brown);
-  margin-top: 1.2rem;
+  margin-top: 1rem;
 }
 
 .content-meta dd {
@@ -329,20 +347,19 @@ onUnmounted(() => {
 
 /* Gallery */
 .gallery {
-  margin-top: 2rem;
+  margin-top: var(--space-6);
 }
 
 .gallery h2 {
-  font-size: 1rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: 1.5rem;
+  margin: 0 0 var(--space-6);
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.6rem, 3.4vw, 2.2rem);
 }
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-3);
 }
 
 .gallery-item {
@@ -351,12 +368,12 @@ onUnmounted(() => {
   background: none;
   cursor: pointer;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
 }
 
 .gallery-item img {
   width: 100%;
-  height: 200px;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
@@ -365,7 +382,6 @@ onUnmounted(() => {
   transform: scale(1.05);
 }
 
-/* Lightbox */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -373,7 +389,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.92);
+  background: rgba(0, 0, 0, 0.89);
+  backdrop-filter: blur(6px);
 }
 
 .lb-close {
@@ -432,7 +449,7 @@ onUnmounted(() => {
   max-width: 85vw;
   max-height: 85vh;
   object-fit: contain;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .lb-caption {
@@ -456,10 +473,9 @@ onUnmounted(() => {
   letter-spacing: 0.1em;
 }
 
-/* Lightbox transition */
 .lightbox-fade-enter-active,
 .lightbox-fade-leave-active {
-  transition: opacity 0.25s ease;
+  transition: opacity 0.28s ease;
 }
 
 .lightbox-fade-enter-from,
@@ -467,18 +483,16 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-@media (max-width: 768px) {
-  .project-detail {
-    padding: 1.5rem 1.5rem 3rem;
-  }
-
-  .hero-image img {
-    max-height: 320px;
-  }
-
+@media (max-width: 1024px) {
   .content-grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: var(--space-8);
+  }
+}
+
+@media (max-width: 640px) {
+  .project-detail {
+    padding: var(--space-6) 0 var(--space-10);
   }
 
   .gallery-grid {

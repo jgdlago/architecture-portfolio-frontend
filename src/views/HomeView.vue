@@ -59,6 +59,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  <div>
   <div id="home">
     <Navbar
       :brand-name="navbar.brand_name"
@@ -110,5 +111,6 @@ onMounted(async () => {
     :services-title="footerServices.title"
     :services-items="footerServices.items"
   />
+  </div>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <footer class="footer">
-    <div class="footer-wrapper">
+    <div class="footer-wrapper container">
       <div class="footer-content">
         <div class="footer-section brand">
           <h3>{{ brandName }}</h3>
@@ -75,42 +75,39 @@ withDefaults(
 .footer {
   background-color: var(--background);
   color: var(--primary-text);
-  border-top: 1px solid color-mix(
-    in srgb,
-    var(--contrast-brown) 20%,
-    transparent
-  );
+  border-top: 1px solid var(--border);
 }
 
 .footer-wrapper {
-  padding: 6rem 3rem 3rem;
+  padding: var(--space-20) 0 var(--space-10);
 }
 
 .footer-content {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  gap: 3rem;
-  margin-bottom: 4rem;
+  grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+  gap: var(--space-8);
+  margin-bottom: var(--space-12);
 }
 
 .footer-section.brand h3 {
-  font-size: 1.1rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
+  line-height: 1;
 }
 
 .footer-section.brand p {
-  font-size: 0.85rem;
+  margin: 0;
+  font-size: 0.88rem;
   color: var(--contrast-brown);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
 }
 
 .footer-section h4 {
-  font-size: 0.8rem;
-  letter-spacing: 0.3em;
+  margin: 0 0 var(--space-4);
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  margin-bottom: 1.5rem;
   color: var(--contrast-gold);
 }
 
@@ -121,15 +118,15 @@ withDefaults(
 }
 
 .footer-section li {
-  font-size: 0.85rem;
-  line-height: 2;
+  font-size: 0.86rem;
+  line-height: 1.9;
   color: var(--primary-text);
 }
 
 .footer-section a {
   color: var(--primary-text);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color var(--transition-fast);
 }
 
 .footer-section a:hover {
@@ -140,15 +137,13 @@ withDefaults(
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 2rem;
-  border-top: 1px solid color-mix(
-    in srgb,
-    var(--contrast-brown) 15%,
-    transparent
-  );
+  gap: var(--space-4);
+  padding-top: var(--space-6);
+  border-top: 1px solid color-mix(in srgb, var(--contrast-brown) 22%, transparent);
 }
 
 .footer-bottom p {
+  margin: 0;
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   color: var(--contrast-brown);
@@ -157,6 +152,7 @@ withDefaults(
 @media (max-width: 1024px) {
   .footer-content {
     grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
   }
 
   .footer-section.brand {
@@ -164,14 +160,14 @@ withDefaults(
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .footer-wrapper {
-    padding: 4rem 3rem 2rem;
+    padding: var(--space-16) 0 var(--space-8);
   }
 
   .footer-content {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
+    gap: var(--space-6);
   }
 
   .footer-section.brand {

@@ -18,6 +18,17 @@ body {
   min-width: 320px;
 }
 
+.container {
+  width: min(100% - 3rem, var(--container-lg));
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .container {
+    width: min(100% - 1.5rem, var(--container-lg));
+  }
+}
+
 button,
 input,
 select,
@@ -53,4 +64,71 @@ svg,
 video {
   display: block;
   max-width: 100%;
+}
+
+.reveal-fade,
+.reveal-slide-up,
+.reveal-slide-left,
+.reveal-slide-right {
+  opacity: 0;
+  transition: opacity 0.65s ease, transform 0.65s ease;
+  will-change: opacity, transform;
+}
+
+.reveal-fade {
+  transform: translate3d(0, 0, 0);
+}
+
+.reveal-slide-up {
+  transform: translate3d(0, 32px, 0);
+}
+
+.reveal-slide-left {
+  transform: translate3d(-26px, 0, 0);
+}
+
+.reveal-slide-right {
+  transform: translate3d(26px, 0, 0);
+}
+
+.reveal-fade.revealed,
+.reveal-slide-up.revealed,
+.reveal-slide-left.revealed,
+.reveal-slide-right.revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 88%, var(--contrast-brown) 12%);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg,
+      transparent,
+      color-mix(in srgb, var(--surface-elevated) 88%, white 12%),
+      transparent);
+  animation: skeleton-shimmer 1.4s infinite;
+}
+
+.skeleton-text {
+  height: 0.85rem;
+  border-radius: 999px;
+}
+
+.skeleton-image {
+  min-height: 220px;
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }

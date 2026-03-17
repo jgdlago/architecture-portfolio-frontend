@@ -1,5 +1,6 @@
 :root {
     --font-family-base: "Inter", "Segoe UI", sans-serif;
+    --font-family-heading: "Playfair Display", "Times New Roman", serif;
     --font-size-h1: clamp(2.8rem, 6vw, 5rem);
     --font-size-h2: clamp(1.5rem, 3vw, 2rem);
     --font-size-h3: 1rem;
@@ -9,10 +10,13 @@
     --section-padding-mobile: 4rem 1.5rem;
 
     --background: #ECECEC;
+    --surface: #f2f0ec;
+    --surface-elevated: #f8f6f1;
     --primary-text: #333333;
     --contrast-gold: #B4A078;
     --contrast-brown: #8C857A;
     --accent: #6C7883;
+    --border: rgba(140, 133, 122, 0.28);
 
     /* Tokens para Hero */
     --hero-text: #ffffff;
@@ -28,21 +32,41 @@
     --space-2: 0.5rem;
     --space-3: 0.75rem;
     --space-4: 1rem;
+    --space-5: 1.25rem;
     --space-6: 1.5rem;
     --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    --container-sm: 640px;
+    --container-md: 900px;
+    --container-lg: 1200px;
+    --container-xl: 1400px;
 
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
     --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 12px 32px rgba(26, 20, 12, 0.14);
+    --shadow-xl: 0 24px 50px rgba(22, 18, 12, 0.18);
     --transition-fast: 0.16s ease;
     --transition-base: 0.24s ease;
 }
 
 .dark {
     --background: #1A1A1A;
+    --surface: #211f1c;
+    --surface-elevated: #2a2723;
     --primary-text: #FFFFFF;
     --contrast-gold: #A0895F;
     --contrast-brown: #6B6354;
     --accent: #5A6978;
+    --border: rgba(107, 99, 84, 0.38);
 
     --hero-text: #ffffff;
     --hero-overlay: rgba(0, 0, 0, 0.65);

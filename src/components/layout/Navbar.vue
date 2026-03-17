@@ -45,7 +45,6 @@ watch(() => route.fullPath, () => {
 
 <template>
   <header class="navbar">
-    <!-- Marca -->
     <div class="brand">
       <RouterLink to="/" class="brand-link">
         <span class="name">{{ brandName }}</span>
@@ -53,7 +52,6 @@ watch(() => route.fullPath, () => {
       </RouterLink>
     </div>
 
-    <!-- Lado direito -->
     <div class="right" :class="{ open: mobileOpen }">
       <nav class="menu">
         <RouterLink :to="{ path: '/', hash: '#home' }" :class="{ active: isSectionActive('#home') }">{{ homeLabel }}</RouterLink>
@@ -62,38 +60,42 @@ watch(() => route.fullPath, () => {
         <RouterLink :to="{ path: '/', hash: '#contact' }" :class="{ active: isSectionActive('#contact') }">{{ contactLabel }}</RouterLink>
       </nav>
 
-      <button
-        class="theme-toggle"
-        @click="toggle"
-        aria-label="Alternar tema"
-      >
+      <button class="theme-toggle" @click="toggle" aria-label="Alternar tema">
         <SunIcon v-if="isDark" />
         <MoonIcon v-else />
       </button>
     </div>
 
-    <!-- Mobile hamburger -->
     <button class="hamburger" @click="mobileOpen = !mobileOpen" aria-label="Menu">
       <XMarkIcon v-if="mobileOpen" />
       <Bars3Icon v-else />
     </button>
+
+    <div v-if="mobileOpen" class="menu-overlay" @click="mobileOpen = false" />
   </header>
 </template>
 
 <style scoped>
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 120;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem 3rem;
-  background-color: color-mix(
-    in srgb,
-    var(--background) 85%,
-    transparent
-  );
+  padding: 1.2rem 1.6rem;
+  border-bottom: 1px solid var(--border);
 }
 
-/* Marca */
+.navbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(12px);
+  z-index: -1;
+}
+
 .brand-link {
   text-decoration: none;
   display: flex;
@@ -102,35 +104,34 @@ watch(() => route.fullPath, () => {
 }
 
 .name {
-  font-size: 1.1rem;
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
   font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--primary-text);
 }
 
 .role {
-  font-size: 0.7rem;
-  letter-spacing: 0.3em;
+  font-size: 0.64rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--contrast-brown);
-  margin-top: 0.3rem;
+  margin-top: 0.45rem;
 }
 
-/* Menu */
 .menu {
   display: flex;
-  gap: 2.5rem;
+  gap: 1.9rem;
 }
 
 .menu a {
   position: relative;
   text-decoration: none;
   color: var(--primary-text);
-  font-size: 0.85rem;
-  letter-spacing: 0.2em;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  padding-bottom: 0.3rem;
+  padding-bottom: 0.35rem;
 }
 
 .menu a::after {
@@ -149,84 +150,112 @@ watch(() => route.fullPath, () => {
   width: 100%;
 }
 
-/* Theme toggle */
 .theme-toggle {
-  background: none;
-  border: none;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-elevated) 76%, transparent);
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  padding: 0.4rem;
   color: var(--primary-text);
-  opacity: 0.7;
-  transition: opacity 0.3s ease, transform 0.2s ease;
+  opacity: 0.88;
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background var(--transition-fast);
 }
 
 .theme-toggle svg {
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
 }
 
 .theme-toggle:hover {
   opacity: 1;
-  transform: rotate(12deg);
+  transform: rotate(10deg) translateY(-1px);
+  background: color-mix(in srgb, var(--contrast-gold) 24%, var(--surface-elevated));
 }
 
 .right {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.2rem;
 }
 
-/* Hamburger - hidden on desktop */
 .hamburger {
   display: none;
-  background: none;
-  border: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  width: 2.2rem;
+  height: 2.2rem;
+  background: color-mix(in srgb, var(--surface-elevated) 76%, transparent);
   cursor: pointer;
-  padding: 0.4rem;
+  place-items: center;
   color: var(--primary-text);
 }
 
 .hamburger svg {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
+}
+
+.menu-overlay {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .navbar {
+    padding: 1.3rem 2.4rem;
+  }
 }
 
 @media (max-width: 768px) {
-  .navbar {
-    padding: 1.2rem 1.5rem;
-    flex-wrap: wrap;
-  }
-
   .hamburger {
-    display: block;
+    display: grid;
+    z-index: 123;
   }
 
   .right {
-    display: none;
-    width: 100%;
+    position: fixed;
+    inset: 0;
+    z-index: 122;
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    padding-top: 1.5rem;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    background: color-mix(in srgb, var(--surface-elevated) 93%, black 7%);
+    transform: translateY(-104%);
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .right.open {
-    display: flex;
+    transform: translateY(0);
   }
 
   .menu {
     flex-direction: column;
-    gap: 1rem;
-    width: 100%;
+    align-items: center;
+    gap: 1.4rem;
   }
 
   .menu a {
-    padding: 0.5rem 0;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    letter-spacing: 0.22em;
+    padding: 0;
   }
 
   .theme-toggle {
-    margin-top: 1rem;
+    width: 2.7rem;
+    height: 2.7rem;
+  }
+
+  .menu-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 121;
+    background: rgba(0, 0, 0, 0.34);
+    backdrop-filter: blur(2px);
   }
 }
 </style>

@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { fetchDashboardStats, type DashboardStats } from '@/api/admin'
+import {
+    ChartBarIcon,
+    FolderOpenIcon,
+    InboxStackIcon,
+} from '@heroicons/vue/24/outline'
 import { onMounted, ref } from 'vue'
 
 const stats = ref<DashboardStats | null>(null)
@@ -15,21 +20,26 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div v-if="isLoading" class="loading">Carregando métricas...</div>
+    <section v-if="isLoading" class="dashboard-loading">
+        <div v-for="index in 3" :key="index" class="skeleton skeleton-image" style="min-height: 120px;" />
+    </section>
 
     <div v-else-if="stats" class="dashboard">
         <div class="cards">
             <div class="card">
+                <FolderOpenIcon class="card-icon" />
                 <span class="card-value">{{ stats.projects.total }}</span>
                 <span class="card-label">Projetos Totais</span>
                 <small>{{ stats.projects.published }} publicados · {{ stats.projects.drafts }} rascunhos</small>
             </div>
             <div class="card">
+                <InboxStackIcon class="card-icon" />
                 <span class="card-value">{{ stats.messages.unread }}</span>
                 <span class="card-label">Mensagens não lidas</span>
                 <small>{{ stats.messages.total }} total</small>
             </div>
             <div class="card">
+                <ChartBarIcon class="card-icon" />
                 <span class="card-value">{{ stats.visits.last_7_days }}</span>
                 <span class="card-label">Visitantes únicos (7 dias)</span>
                 <small>
@@ -81,48 +91,67 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.loading {
-    padding: 2rem;
-    color: var(--contrast-brown);
+.dashboard-loading {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
 }
 
 .dashboard {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--space-6);
 }
 
 .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
 }
 
 .card {
-    background: color-mix(in srgb, var(--background) 90%, black 10%);
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
-    border-radius: 10px;
-    padding: 1.2rem;
+    position: relative;
+    background: color-mix(in srgb, var(--surface) 95%, black 5%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
     display: flex;
     flex-direction: column;
+    gap: var(--space-1);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--contrast-brown);
+    margin-bottom: var(--space-1);
 }
 
 .card-value {
     font-size: 2rem;
     font-weight: 700;
+    line-height: 1;
     color: var(--contrast-gold);
 }
 
 .card-label {
     font-size: 0.85rem;
     font-weight: 600;
-    margin-top: 0.2rem;
+    line-height: 1.3;
 }
 
 .card small {
     font-size: 0.75rem;
     color: var(--contrast-brown);
-    margin-top: 0.3rem;
+    margin-top: var(--space-2);
+    line-height: 1.45;
 }
 
 .panels {
@@ -132,10 +161,11 @@ onMounted(async () => {
 }
 
 .panel {
-    background: color-mix(in srgb, var(--background) 93%, black 7%);
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
-    border-radius: 10px;
-    padding: 1.2rem;
+    background: color-mix(in srgb, var(--surface) 94%, black 6%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
 }
 
 .panel h3 {
@@ -197,7 +227,7 @@ onMounted(async () => {
     display: flex;
     align-items: flex-end;
     gap: 3px;
-    height: 120px;
+    height: 130px;
     overflow-x: auto;
 }
 
@@ -213,7 +243,11 @@ onMounted(async () => {
 
 .bar {
     width: 100%;
-    background: var(--contrast-gold);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--contrast-gold) 90%, white 10%),
+        color-mix(in srgb, var(--contrast-gold) 72%, var(--contrast-brown) 28%)
+    );
     border-radius: 3px 3px 0 0;
     min-height: 4px;
 }
@@ -225,5 +259,15 @@ onMounted(async () => {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
     max-height: 35px;
+}
+
+@media (max-width: 900px) {
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-loading {
+        grid-template-columns: 1fr;
+    }
 }
 </style>

@@ -1,11 +1,11 @@
 <template>
-  <section class="process">
-    <header>
+  <section class="process container">
+    <header class="reveal-slide-up">
       <h2>{{ title }}</h2>
     </header>
 
     <div class="steps">
-      <div v-for="(step, index) in steps" :key="`${step.title}-${index}`" class="step">
+      <div v-for="(step, index) in steps" :key="`${step.title}-${index}`" class="step reveal-slide-up" :style="{ transitionDelay: `${Math.min(index * 80, 280)}ms` }">
         <span class="index">{{ String(index + 1).padStart(2, '0') }}</span>
         <h3>{{ step.title }}</h3>
         <p>{{ step.description }}</p>
@@ -15,6 +15,8 @@
 </template>
 
 <script setup lang="ts">
+import { useScrollReveal } from '@/composables/useScrollReveal';
+
 withDefaults(
   defineProps<{
     title?: string
@@ -38,55 +40,84 @@ withDefaults(
     ],
   },
 )
+
+useScrollReveal()
 </script>
 
 <style scoped>
 .process {
-  padding: 6rem 3rem;
+  padding: var(--space-20) 0;
   background-color: var(--background);
   color: var(--primary-text);
 }
 
 .process header {
-  margin-bottom: 4rem;
+  margin-bottom: var(--space-10);
 }
 
 .process h2 {
-  font-size: 1.5rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
+  margin: 0;
+  font-family: var(--font-family-heading);
+  font-size: clamp(2rem, 4.3vw, 3rem);
+  line-height: 1.1;
 }
 
 .steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 3rem;
+  gap: var(--space-4);
 }
 
 .step {
-  max-width: 320px;
+  position: relative;
+  padding: var(--space-8);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
 }
 
 .index {
-  font-size: 0.8rem;
-  letter-spacing: 0.3em;
-  color: var(--contrast-gold);
+  display: inline-block;
+  font-family: var(--font-family-heading);
+  font-size: 2.2rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--contrast-gold) 74%, transparent);
 }
 
 .step h3 {
-  font-size: 1rem;
-  margin: 1rem 0;
+  margin: var(--space-4) 0 var(--space-3);
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
 }
 
 .step p {
+  margin: 0;
   font-size: 0.9rem;
-  line-height: 1.8;
+  line-height: 1.86;
   color: var(--contrast-brown);
 }
 
-@media (max-width: 768px) {
+.step:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--contrast-gold) 55%, var(--border));
+}
+
+@media (max-width: 1024px) {
   .steps {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .process {
+    padding: var(--space-16) 0;
+  }
+
+  .step {
+    padding: var(--space-6);
   }
 }
 </style>

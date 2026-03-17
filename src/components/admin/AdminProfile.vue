@@ -217,17 +217,19 @@ onMounted(load)
 }
 
 .card {
-    background: color-mix(in srgb, var(--background) 96%, black 4%);
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 14%, transparent);
-    border-radius: 14px;
+    background: color-mix(in srgb, var(--surface-elevated) 96%, black 4%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     padding: var(--space-5);
     display: grid;
     gap: var(--space-4);
+    box-shadow: var(--shadow-sm);
 }
 
 .card header h2 {
     margin: 0;
-    font-size: var(--text-lg);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.35rem, 2.8vw, 1.8rem);
 }
 
 .card header p {
@@ -255,9 +257,9 @@ onMounted(load)
 
 .field input {
     width: 100%;
-    border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
-    background: var(--background);
-    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    border-radius: var(--radius-md);
     padding: 0.6rem 0.75rem;
     color: var(--primary-text);
 }

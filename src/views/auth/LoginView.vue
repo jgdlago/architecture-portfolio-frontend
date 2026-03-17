@@ -39,6 +39,7 @@ const submit = async () => {
 </script>
 
 <template>
+  <div>
   <Navbar />
   <main class="login-view">
     <form class="login-card" @submit.prevent="submit">
@@ -64,6 +65,7 @@ const submit = async () => {
       </button>
     </form>
   </main>
+  </div>
 </template>
 
 <style scoped>
@@ -71,29 +73,33 @@ const submit = async () => {
   min-height: calc(100vh - 96px);
   display: grid;
   place-items: center;
-  padding: 2rem;
+  padding: var(--space-8) var(--space-4);
 }
 
 .login-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 450px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  background: color-mix(in srgb, var(--background) 92%, black 8%);
-  border: 1px solid color-mix(in srgb, var(--contrast-brown) 35%, transparent);
-  border-radius: 14px;
-  padding: 2rem;
+  gap: var(--space-4);
+  background: color-mix(in srgb, var(--surface-elevated) 92%, black 8%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-8);
 }
 
 .login-card h1 {
   margin: 0;
-  font-size: 1.4rem;
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.9rem, 5vw, 2.4rem);
+  line-height: 1.08;
 }
 
 .login-card p {
   margin: 0;
   color: var(--contrast-brown);
+  line-height: 1.7;
 }
 
 label {
@@ -103,21 +109,40 @@ label {
 }
 
 input {
-  border: 1px solid color-mix(in srgb, var(--contrast-brown) 50%, transparent);
-  border-radius: 8px;
-  background: var(--background);
+  border: 1px solid color-mix(in srgb, var(--contrast-brown) 40%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--background) 96%, transparent);
   color: var(--primary-text);
-  padding: 0.8rem 0.9rem;
+  padding: 0.84rem 0.9rem;
+}
+
+input:focus {
+  border-color: color-mix(in srgb, var(--contrast-gold) 72%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--contrast-gold) 16%, transparent);
+  outline: none;
 }
 
 button {
   border: none;
-  border-radius: 8px;
-  padding: 0.8rem 1rem;
+  border-radius: var(--radius-md);
+  padding: 0.82rem 1rem;
   font-weight: 600;
-  background: var(--contrast-gold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.76rem;
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--contrast-gold) 84%, white 16%),
+    color-mix(in srgb, var(--contrast-gold) 68%, var(--contrast-brown) 32%)
+  );
   color: var(--primary-text);
   cursor: pointer;
+  transition: transform var(--transition-fast), filter var(--transition-fast);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
 }
 
 .error {
@@ -128,5 +153,11 @@ button {
 .field-error {
   color: #b83333;
   font-size: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .login-card {
+    padding: var(--space-6);
+  }
 }
 </style>

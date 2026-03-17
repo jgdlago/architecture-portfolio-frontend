@@ -1,12 +1,12 @@
 <template>
-  <section class="experience">
-    <header>
+  <section class="experience container">
+    <header class="reveal-slide-up">
       <h2>{{ title }}</h2>
       <p>{{ subtitle }}</p>
     </header>
 
     <div class="blocks">
-      <div v-for="(block, index) in blocks" :key="`${block.title}-${index}`" class="block">
+      <div v-for="(block, index) in blocks" :key="`${block.title}-${index}`" class="block reveal-slide-up" :style="{ transitionDelay: `${Math.min(index * 80, 280)}ms` }">
         <h3>{{ block.title }}</h3>
         <ul>
           <li v-for="(item, itemIndex) in block.items" :key="`${item}-${itemIndex}`">{{ item }}</li>
@@ -17,6 +17,8 @@
 </template>
 
 <script setup lang="ts">
+import { useScrollReveal } from '@/composables/useScrollReveal';
+
 withDefaults(
   defineProps<{
     title?: string
@@ -42,33 +44,32 @@ withDefaults(
     ],
   },
 )
+
+useScrollReveal()
 </script>
 
 <style scoped>
 .experience {
-  padding: 6rem 3rem;
-  background-color: color-mix(
-    in srgb,
-    var(--background) 90%,
-    transparent
-  );
+  padding: var(--space-20) 0;
+  background-color: color-mix(in srgb, var(--background) 92%, transparent);
   color: var(--primary-text);
 }
 
 .experience header {
   max-width: 600px;
-  margin-bottom: 4rem;
+  margin-bottom: var(--space-10);
 }
 
 .experience h2 {
-  font-size: 1.5rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  margin-bottom: 1.5rem;
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-family-heading);
+  font-size: clamp(2rem, 4.3vw, 3rem);
+  line-height: 1.1;
 }
 
 .experience header p {
-  font-size: 0.95rem;
+  margin: 0;
+  font-size: 1rem;
   line-height: 1.8;
   color: var(--contrast-brown);
 }
@@ -76,14 +77,29 @@ withDefaults(
 .blocks {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 3rem;
+  gap: var(--space-4);
+}
+
+.block {
+  padding: var(--space-8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.block:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--contrast-gold) 50%, var(--border));
 }
 
 .block h3 {
-  font-size: 0.9rem;
-  letter-spacing: 0.2em;
+  margin: 0 0 var(--space-4);
+  font-size: 0.92rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  margin-bottom: 1.5rem;
 }
 
 .block ul {
@@ -93,14 +109,37 @@ withDefaults(
 }
 
 .block li {
-  font-size: 0.85rem;
-  line-height: 2;
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.88rem;
+  line-height: 1.9;
   color: var(--primary-text);
 }
 
-@media (max-width: 768px) {
+.block li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.78rem;
+  width: 0.33rem;
+  height: 0.33rem;
+  border-radius: 999px;
+  background: var(--contrast-gold);
+}
+
+@media (max-width: 1024px) {
   .blocks {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .experience {
+    padding: var(--space-16) 0;
+  }
+
+  .block {
+    padding: var(--space-6);
   }
 }
 </style>

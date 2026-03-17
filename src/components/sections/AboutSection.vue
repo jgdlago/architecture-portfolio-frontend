@@ -1,11 +1,11 @@
 <template>
-  <section class="about">
-    <div class="image">
+  <section class="about container">
+    <div class="image reveal-slide-left">
       <img v-if="image" :src="image" alt="Arquiteta" />
       <div v-else class="image-placeholder">Imagem nao cadastrada</div>
     </div>
 
-    <div class="content">
+    <div class="content reveal-slide-right">
       <h2>Sobre</h2>
       <p>{{ text }}</p>
     </div>
@@ -13,6 +13,8 @@
 </template>
 
 <script setup lang="ts">
+import { useScrollReveal } from '@/composables/useScrollReveal';
+
 withDefaults(
   defineProps<{
     text?: string
@@ -23,42 +25,72 @@ withDefaults(
     image: undefined,
   },
 )
+
+useScrollReveal()
 </script>
 
 <style scoped>
 .about {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  padding: 6rem 3rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-12);
+  padding: var(--space-20) 0;
   background-color: var(--background);
+}
+
+.image {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
 }
 
 .image img {
   width: 100%;
+  min-height: 360px;
+  height: 100%;
   object-fit: cover;
-  filter: grayscale(100%);
+  filter: grayscale(20%);
 }
 
 .image-placeholder {
-  min-height: 340px;
+  min-height: 360px;
   display: grid;
   place-items: center;
-  border: 1px dashed color-mix(in srgb, var(--contrast-brown) 35%, transparent);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-xl);
   color: var(--contrast-brown);
   font-size: 0.9rem;
 }
 
 .content h2 {
-  font-size: 1.5rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: 2rem;
+  margin: 0 0 var(--space-6);
+  font-family: var(--font-family-heading);
+  font-size: clamp(2rem, 4.3vw, 3rem);
+  line-height: 1.1;
 }
 
 .content p {
-  font-size: 1rem;
-  line-height: 1.8;
+  margin: 0;
+  font-size: 1.04rem;
+  line-height: 1.9;
   color: var(--contrast-brown);
+}
+
+@media (max-width: 1024px) {
+  .about {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+}
+
+@media (max-width: 640px) {
+  .about {
+    padding: var(--space-16) 0;
+  }
+
+  .image img,
+  .image-placeholder {
+    min-height: 260px;
+  }
 }
 </style>
