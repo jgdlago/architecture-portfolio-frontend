@@ -4,7 +4,7 @@ import { http } from '@/api/http'
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { resolveMediaUrl } from '../api/http'
 import { fetchProjects, type ProjectListItem } from '../api/projects'
@@ -20,6 +20,7 @@ const categories = ref<Category[]>([])
 const activeCategory = ref<string | undefined>(undefined)
 const isLoading = ref(true)
 const settings = ref<Record<string, any>>({})
+let latestLoadRequest = 0
 
 const filteredProjects = computed(() => projects.value)
 const footer = computed(() => settings.value.footer ?? {})
@@ -29,11 +30,22 @@ const seo = computed(() => settings.value.seo ?? {})
 const { observe } = useScrollReveal()
 
 const loadProjects = async (category?: string) => {
+  const requestId = ++latestLoadRequest
   isLoading.value = true
+
   try {
-    projects.value = await fetchProjects(category)
+    const loadedProjects = await fetchProjects(category)
+    if (requestId !== latestLoadRequest) {
+      return
+    }
+
+    projects.value = loadedProjects
   } finally {
-    isLoading.value = false
+    if (requestId === latestLoadRequest) {
+      isLoading.value = false
+      await nextTick()
+      observe()
+    }
   }
 }
 
@@ -62,17 +74,7 @@ onMounted(async () => {
     }
   } catch { /* ignore */ }
   await loadProjects()
-  await nextTick()
-  observe()
 })
-
-watch(
-  () => filteredProjects.value.length,
-  async () => {
-    await nextTick()
-    observe()
-  },
-)
 </script>
 
 <template>

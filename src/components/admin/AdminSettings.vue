@@ -44,8 +44,8 @@ const sectionLabels: Record<typeof activeSection.value, string> = {
     experience: 'Experiência',
     contact: 'Contato',
     footer: 'Rodapé',
-    footerServices: 'Serviços Rodapé',
-    seo: 'Título da Aba',
+    footerServices: 'Serviços no rodapé',
+    seo: 'Título da aba',
 }
 
 const load = async () => {
@@ -192,8 +192,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -238,8 +238,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -273,8 +273,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -308,8 +308,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -353,8 +353,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -384,8 +384,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -400,7 +400,7 @@ onMounted(load)
 
         <!-- Footer -->
         <form v-else-if="activeSection === 'footer'" class="section-form" @submit.prevent="save('footer', footer)">
-            <h2>Footer</h2>
+            <h2>Rodapé</h2>
             <div class="form-grid">
                 <div class="field"><label>Nome</label><input v-model="footer.brand_name" /></div>
                 <div class="field"><label>Subtítulo</label><input v-model="footer.brand_subtitle" /></div>
@@ -412,14 +412,14 @@ onMounted(load)
                 <div class="field"><label>Copyright</label><input v-model="footer.copyright" /></div>
                 <div class="field"><label>CAU</label><input v-model="footer.cau" /></div>
             </div>
-            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Footer</button>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar rodapé</button>
 
             <div class="live-preview">
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'">White mode</button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'">Dark mode</button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -459,7 +459,7 @@ onMounted(load)
 
         <!-- SEO -->
         <form v-else class="section-form" @submit.prevent="save('seo', seo)">
-            <h2>Título da Aba e Google</h2>
+            <h2>Título da aba e Google</h2>
             <p class="section-help">Preencha como seu site deve aparecer na aba do navegador e em resultados de busca.</p>
             <div class="field">
                 <label>Nome do site (título)</label>
@@ -611,8 +611,10 @@ onMounted(load)
     border: none;
     background: transparent;
     color: var(--contrast-brown);
-    font-size: 0.72rem;
-    padding: 0.3rem 0.65rem;
+    font-size: 0.95rem;
+    line-height: 1;
+    min-width: 2.1rem;
+    padding: 0.38rem 0.5rem;
     cursor: pointer;
 }
 
@@ -620,6 +622,18 @@ onMounted(load)
     background: var(--contrast-gold);
     color: var(--primary-text);
     font-weight: 700;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .site-preview-shell {
@@ -823,3 +837,5 @@ onMounted(load)
     }
 }
 </style>
+
+

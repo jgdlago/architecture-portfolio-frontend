@@ -48,7 +48,7 @@ interface PaginatedProjects {
 
 export async function fetchProjects(category?: string): Promise<ProjectListItem[]> {
     const { data } = await http.get<PaginatedProjects>('/projects', {
-        params: category ? { category } : undefined,
+        params: category ? { category, category_slug: category } : undefined,
     })
 
     return data.data

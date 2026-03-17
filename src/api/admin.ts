@@ -1,4 +1,4 @@
-import { http } from './http'
+import { http, resolveMediaUrl } from './http'
 
 export interface AdminCategory {
     id: number
@@ -16,6 +16,25 @@ export interface AdminProject {
     description: string | null
     category: string | null
     category_slug: string | null
+    cover_image_path: string | null
+    location: string | null
+    year: number | null
+    area_m2: string | null
+    is_featured: boolean
+    published_at: string | null
+}
+
+export interface AdminProjectDetail {
+    id: number
+    title: string
+    slug: string
+    short_description: string | null
+    description: string | null
+    category: {
+        id: number
+        name: string
+        slug: string
+    } | null
     cover_image_path: string | null
     location: string | null
     year: number | null
@@ -125,8 +144,8 @@ export async function fetchAdminProjects(): Promise<AdminProject[]> {
     return data.data
 }
 
-export async function fetchAdminProject(id: number): Promise<AdminProject> {
-    const { data } = await http.get<{ data: AdminProject }>(`/admin/projects/${id}`)
+export async function fetchAdminProject(id: number): Promise<AdminProjectDetail> {
+    const { data } = await http.get<{ data: AdminProjectDetail }>(`/admin/projects/${id}`)
     return data.data
 }
 
@@ -174,7 +193,10 @@ export async function uploadFile(file: File, folder?: string): Promise<{ path: s
     formData.append('file', file)
     if (folder) formData.append('folder', folder)
     const { data } = await http.post<{ path: string; url: string }>('/admin/upload', formData)
-    return data
+    return {
+        path: data.path,
+        url: resolveMediaUrl(data.path || data.url),
+    }
 }
 
 export async function deleteFile(path: string): Promise<void> {

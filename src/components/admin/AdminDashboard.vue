@@ -29,14 +29,14 @@ onMounted(async () => {
             <div class="card">
                 <FolderOpenIcon class="card-icon" />
                 <span class="card-value">{{ stats.projects.total }}</span>
-                <span class="card-label">Projetos Totais</span>
+                <span class="card-label">Projetos totais</span>
                 <small>{{ stats.projects.published }} publicados · {{ stats.projects.drafts }} rascunhos</small>
             </div>
             <div class="card">
                 <InboxStackIcon class="card-icon" />
                 <span class="card-value">{{ stats.messages.unread }}</span>
                 <span class="card-label">Mensagens não lidas</span>
-                <small>{{ stats.messages.total }} total</small>
+                <small>{{ stats.messages.total }} no total</small>
             </div>
             <div class="card">
                 <ChartBarIcon class="card-icon" />
@@ -53,7 +53,7 @@ onMounted(async () => {
 
         <div class="panels">
             <div class="panel">
-                <h3>Mensagens Recentes</h3>
+                <h3>Mensagens recentes</h3>
                 <ul v-if="stats.messages.recent.length" class="recent-list">
                     <li v-for="msg in stats.messages.recent" :key="msg.id">
                         <strong>{{ msg.name }}</strong> — {{ msg.email }}
@@ -65,7 +65,7 @@ onMounted(async () => {
             </div>
 
             <div class="panel">
-                <h3>Páginas Mais Acessadas (30 dias)</h3>
+                <h3>Páginas mais acessadas (30 dias)</h3>
                 <ul v-if="stats.visits.top_pages.length" class="top-pages">
                     <li v-for="page in stats.visits.top_pages" :key="page.page">
                         <span>{{ page.page }}</span>
