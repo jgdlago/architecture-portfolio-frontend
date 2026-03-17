@@ -33,7 +33,7 @@ export function useTheme() {
         transitionTimer = window.setTimeout(() => {
             html.classList.remove('theme-transitioning')
             transitionTimer = null
-        }, 380)
+        }, 560)
     }
 
     const updateTheme = () => {

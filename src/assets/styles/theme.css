@@ -76,8 +76,8 @@
 html.theme-transitioning,
 html.theme-transitioning * {
     transition-property: background-color, color, border-color, box-shadow, fill, stroke;
-    transition-duration: 0.3s;
-    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    transition-duration: 0.44s;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html.theme-transitioning body::before {
@@ -91,22 +91,26 @@ html.theme-transitioning body::before {
             color-mix(in srgb, var(--accent) 14%, transparent) 26%,
             transparent 60%);
     clip-path: circle(0 at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%));
-    animation: theme-ripple-reveal 0.36s cubic-bezier(0.2, 0.9, 0.25, 1);
+    animation: theme-ripple-reveal 0.52s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes theme-ripple-reveal {
     0% {
-        opacity: 0.08;
+        opacity: 0.05;
         clip-path: circle(0 at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%));
     }
 
-    35% {
-        opacity: 0.48;
+    28% {
+        opacity: 0.26;
+    }
+
+    62% {
+        opacity: 0.18;
     }
 
     100% {
         opacity: 0;
-        clip-path: circle(160vmax at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%));
+        clip-path: circle(170vmax at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%));
     }
 }
 
