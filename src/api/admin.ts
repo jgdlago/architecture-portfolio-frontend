@@ -1,4 +1,4 @@
-import { http } from './http'
+import { http, resolveMediaUrl } from './http'
 
 export interface AdminCategory {
     id: number
@@ -193,7 +193,10 @@ export async function uploadFile(file: File, folder?: string): Promise<{ path: s
     formData.append('file', file)
     if (folder) formData.append('folder', folder)
     const { data } = await http.post<{ path: string; url: string }>('/admin/upload', formData)
-    return data
+    return {
+        path: data.path,
+        url: resolveMediaUrl(data.path || data.url),
+    }
 }
 
 export async function deleteFile(path: string): Promise<void> {

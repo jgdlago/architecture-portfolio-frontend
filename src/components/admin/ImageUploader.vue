@@ -26,7 +26,7 @@ const handleFileChange = async (event: Event) => {
     isUploading.value = true
     try {
         const result = await uploadFile(file, props.folder ?? 'uploads')
-        previewUrl.value = result.url
+        previewUrl.value = resolveMediaUrl(result.path)
         emit('update:modelValue', result.path)
         emit('uploaded', result)
     } catch {

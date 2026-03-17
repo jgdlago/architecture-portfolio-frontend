@@ -220,7 +220,7 @@ const uploadGalleryImage = async (event: Event) => {
         } else {
             pendingImages.value.push({
                 path: result.path,
-                url: result.url,
+                url: resolveMediaUrl(result.path),
                 isCover: pendingImages.value.length === 0 && !form.value.cover_image_path,
             })
 
