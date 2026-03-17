@@ -93,7 +93,7 @@ onMounted(load)
         <h3>Categorias cadastradas</h3>
         <div v-if="!categories.length" class="empty">
             <strong>Sem categorias</strong>
-            <p>Crie uma categoria para organizar os projetos no portfolio.</p>
+            <p>Crie uma categoria para organizar os projetos no portfólio.</p>
         </div>
 
         <ul class="list">

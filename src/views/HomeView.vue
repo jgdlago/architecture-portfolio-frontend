@@ -30,8 +30,8 @@ const experience = computed(() => settings.value.experience ?? {})
 const contact = computed(() => settings.value.contact ?? {})
 
 const applySeo = () => {
-  const seoTitle = seo.value.title || 'Portfolio de Arquitetura'
-  const seoDescription = seo.value.description || 'Portfolio de arquitetura com projetos residenciais e comerciais.'
+  const seoTitle = seo.value.title || 'Portfólio de Arquitetura'
+  const seoDescription = seo.value.description || 'Portfólio de arquitetura com projetos residenciais e comerciais.'
 
   document.title = seoTitle
 

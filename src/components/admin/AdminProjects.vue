@@ -192,7 +192,7 @@ const removeProjectConfirmed = async () => {
 
     try {
         await deleteAdminProject(id)
-        toast.success('Projeto excluido.')
+        toast.success('Projeto excluído.')
         await loadProjects()
     } catch (error) {
         toast.error(getApiErrorMessage(error, 'Erro ao excluir projeto.'))
@@ -314,7 +314,7 @@ onMounted(loadProjects)
             <form class="project-form" @submit.prevent="submitProject">
                 <div class="form-grid">
                     <div class="field">
-                        <label>Titulo *</label>
+                        <label>Título *</label>
                         <input v-model="form.title" required />
                         <small v-if="errorFor('title')" class="field-error">{{ errorFor('title') }}</small>
                     </div>
@@ -346,7 +346,7 @@ onMounted(loadProjects)
                     </div>
 
                     <div class="field">
-                        <label>Area (m2)</label>
+                        <label>Área (m2)</label>
                         <input v-model="form.area_m2" type="number" step="0.01" min="0" />
                         <small v-if="errorFor('area_m2')" class="field-error">{{ errorFor('area_m2') }}</small>
                     </div>
@@ -360,13 +360,13 @@ onMounted(loadProjects)
                 </div>
 
                 <div class="field">
-                    <label>Descricao curta</label>
+                    <label>Descrição curta</label>
                     <input v-model="form.short_description" placeholder="Resumo do projeto" />
                     <small v-if="errorFor('short_description')" class="field-error">{{ errorFor('short_description') }}</small>
                 </div>
 
                 <div class="field">
-                    <label>Descricao completa</label>
+                    <label>Descrição completa</label>
                     <textarea v-model="form.description" rows="4"></textarea>
                     <small v-if="errorFor('description')" class="field-error">{{ errorFor('description') }}</small>
                 </div>
@@ -374,7 +374,7 @@ onMounted(loadProjects)
                 <div class="field">
                     <label>Imagem de Capa</label>
                     <ImageUploader v-model="form.cover_image_path" folder="projects" />
-                    <small class="field-help">Voce tambem pode escolher uma capa na galeria abaixo.</small>
+                    <small class="field-help">Você também pode escolher uma capa na galeria abaixo.</small>
                 </div>
 
                 <div class="field">
@@ -424,12 +424,12 @@ onMounted(loadProjects)
                             />
                         </label>
                     </div>
-                    <small v-if="!isEditing" class="field-help">As imagens enviadas agora serao vinculadas ao projeto apos clicar em criar.</small>
+                    <small v-if="!isEditing" class="field-help">As imagens enviadas agora serão vinculadas ao projeto após clicar em criar.</small>
                 </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn-primary" :disabled="isSaving">
-                        {{ isSaving ? 'Salvando...' : isEditing ? 'Salvar alteracoes' : 'Criar projeto' }}
+                        {{ isSaving ? 'Salvando...' : isEditing ? 'Salvar alterações' : 'Criar projeto' }}
                     </button>
                 </div>
             </form>
@@ -443,7 +443,7 @@ onMounted(loadProjects)
 
             <div v-if="!projects.length" class="empty">
                 <strong>Nenhum projeto cadastrado</strong>
-                <p>Use "Novo Projeto" para publicar o primeiro item do portfolio.</p>
+                <p>Use "Novo Projeto" para publicar o primeiro item do portfólio.</p>
             </div>
 
             <ul class="project-list">

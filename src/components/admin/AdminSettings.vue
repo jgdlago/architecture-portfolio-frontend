@@ -44,8 +44,8 @@ const sectionLabels: Record<typeof activeSection.value, string> = {
     experience: 'Experiência',
     contact: 'Contato',
     footer: 'Rodapé',
-    footerServices: 'Serviços Rodapé',
-    seo: 'Título da Aba',
+    footerServices: 'Serviços no rodapé',
+    seo: 'Título da aba',
 }
 
 const load = async () => {
@@ -400,7 +400,7 @@ onMounted(load)
 
         <!-- Footer -->
         <form v-else-if="activeSection === 'footer'" class="section-form" @submit.prevent="save('footer', footer)">
-            <h2>Footer</h2>
+            <h2>Rodapé</h2>
             <div class="form-grid">
                 <div class="field"><label>Nome</label><input v-model="footer.brand_name" /></div>
                 <div class="field"><label>Subtítulo</label><input v-model="footer.brand_subtitle" /></div>
@@ -412,7 +412,7 @@ onMounted(load)
                 <div class="field"><label>Copyright</label><input v-model="footer.copyright" /></div>
                 <div class="field"><label>CAU</label><input v-model="footer.cau" /></div>
             </div>
-            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Footer</button>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar rodapé</button>
 
             <div class="live-preview">
                 <div class="preview-header">
@@ -459,7 +459,7 @@ onMounted(load)
 
         <!-- SEO -->
         <form v-else class="section-form" @submit.prevent="save('seo', seo)">
-            <h2>Título da Aba e Google</h2>
+            <h2>Título da aba e Google</h2>
             <p class="section-help">Preencha como seu site deve aparecer na aba do navegador e em resultados de busca.</p>
             <div class="field">
                 <label>Nome do site (título)</label>
