@@ -26,7 +26,7 @@ withDefaults(
     blocks?: Array<{ title: string; items: string[] }>
   }>(),
   {
-    title: 'Atuacao',
+    title: 'Atuação',
     subtitle: 'Arquitetura aplicada a diferentes escalas e contextos, sempre com atencao ao lugar e as pessoas.',
     blocks: () => [
       {
@@ -35,10 +35,10 @@ withDefaults(
       },
       {
         title: 'Experiencia',
-        items: ['+6 anos de pratica profissional', 'Projetos executivos e acompanhamento de obra', 'Atuacao do conceito a execucao'],
+        items: ['+6 anos de pratica profissional', 'Projetos executivos e acompanhamento de obra', 'Atuação do conceito a execucao'],
       },
       {
-        title: 'Atuacao',
+        title: 'Atuação',
         items: ['Brasil', 'Projetos remotos', 'Contextos urbanos e naturais'],
       },
     ],

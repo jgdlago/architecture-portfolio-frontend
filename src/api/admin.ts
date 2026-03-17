@@ -22,6 +22,25 @@ export interface AdminProject {
     area_m2: string | null
     is_featured: boolean
     published_at: string | null
+}
+
+export interface AdminProjectDetail {
+    id: number
+    title: string
+    slug: string
+    short_description: string | null
+    description: string | null
+    category: {
+        id: number
+        name: string
+        slug: string
+    } | null
+    cover_image_path: string | null
+    location: string | null
+    year: number | null
+    area_m2: string | null
+    is_featured: boolean
+    published_at: string | null
     images?: AdminProjectImage[]
 }
 
@@ -125,8 +144,8 @@ export async function fetchAdminProjects(): Promise<AdminProject[]> {
     return data.data
 }
 
-export async function fetchAdminProject(id: number): Promise<AdminProject> {
-    const { data } = await http.get<{ data: AdminProject }>(`/admin/projects/${id}`)
+export async function fetchAdminProject(id: number): Promise<AdminProjectDetail> {
+    const { data } = await http.get<{ data: AdminProjectDetail }>(`/admin/projects/${id}`)
     return data.data
 }
 

@@ -12,6 +12,7 @@ import {
     uploadFile,
     type AdminCategory,
     type AdminProject,
+    type AdminProjectDetail,
     type AdminProjectImage,
 } from '@/api/admin'
 import { resolveMediaUrl } from '@/api/http'
@@ -35,7 +36,7 @@ const isLoading = ref(true)
 const isSaving = ref(false)
 const isUploadingGallery = ref(false)
 
-const editingProject = ref<AdminProject | null>(null)
+const editingProject = ref<AdminProjectDetail | null>(null)
 const projectImages = ref<AdminProjectImage[]>([])
 const pendingImages = ref<PendingImage[]>([])
 const showForm = ref(false)
@@ -56,7 +57,6 @@ function emptyForm() {
         year: '' as string | number,
         area_m2: '' as string | number,
         is_featured: false,
-        published_at: '',
     }
 }
 
@@ -102,15 +102,12 @@ const openEdit = async (project: AdminProject) => {
             slug: full.slug,
             short_description: full.short_description ?? '',
             description: full.description ?? '',
-            project_category_id: full.category_slug
-                ? categories.value.find((c) => c.slug === full.category_slug)?.id ?? ''
-                : '',
+            project_category_id: full.category?.id ?? '',
             cover_image_path: full.cover_image_path ?? '',
             location: full.location ?? '',
             year: full.year ?? '',
             area_m2: full.area_m2 ?? '',
             is_featured: full.is_featured,
-            published_at: full.published_at ? full.published_at.slice(0, 16) : '',
         }
         projectImages.value = full.images ?? []
         showForm.value = true
@@ -164,7 +161,6 @@ const submitProject = async () => {
             year: form.value.year ? Number(form.value.year) : null,
             area_m2: form.value.area_m2 ? Number(form.value.area_m2) : null,
             is_featured: form.value.is_featured,
-            published_at: form.value.published_at || null,
         }
 
         if (editingProject.value) {
@@ -353,12 +349,6 @@ onMounted(loadProjects)
                         <label>Area (m2)</label>
                         <input v-model="form.area_m2" type="number" step="0.01" min="0" />
                         <small v-if="errorFor('area_m2')" class="field-error">{{ errorFor('area_m2') }}</small>
-                    </div>
-
-                    <div class="field">
-                        <label>Publicar em</label>
-                        <input v-model="form.published_at" type="datetime-local" />
-                        <small v-if="errorFor('published_at')" class="field-error">{{ errorFor('published_at') }}</small>
                     </div>
 
                     <div class="field checkbox-field">
