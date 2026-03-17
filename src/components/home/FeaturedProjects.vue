@@ -17,10 +17,11 @@
         <div class="image-wrapper">
           <img v-if="resolveMediaUrl(project.cover_image_path)" :src="resolveMediaUrl(project.cover_image_path)" :alt="project.title" />
           <div v-else class="no-image">Sem imagem cadastrada</div>
+          <span v-if="project.category" class="card-category">{{ project.category }}</span>
 
           <div class="overlay">
             <h3>{{ project.title }}</h3>
-            <span>{{ project.category || 'Projeto' }}</span>
+            <p v-if="project.short_description" class="overlay-description">{{ project.short_description }}</p>
           </div>
         </div>
       </RouterLink>
@@ -154,11 +155,33 @@ watch(
   color: #f7f3ed;
 }
 
-.overlay span {
-  font-size: 0.74rem;
+.overlay-description {
+  margin: 0;
+  color: color-mix(in srgb, #f7f3ed 84%, transparent);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  max-width: 56ch;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-category {
+  position: absolute;
+  top: 0.8rem;
+  left: 0.8rem;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--contrast-gold) 84%, white 16%);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
 .project:hover img {
@@ -168,6 +191,11 @@ watch(
 
 .project:hover .overlay {
   opacity: 1;
+}
+
+.project:hover .card-category {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .all-projects {
