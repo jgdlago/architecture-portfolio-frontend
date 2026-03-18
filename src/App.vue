@@ -33,4 +33,10 @@ body {
   opacity: 0;
   transform: translateY(6px);
 }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: ease;
+}
 </style>

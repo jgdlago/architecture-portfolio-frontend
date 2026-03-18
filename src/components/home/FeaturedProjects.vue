@@ -2,7 +2,7 @@
   <section class="featured container">
     <header class="header reveal-slide-up">
       <h2>{{ title }}</h2>
-      <p>{{ description }}</p>
+      <div class="section-description" v-html="description" />
     </header>
 
     <div class="grid">
@@ -83,12 +83,16 @@ watch(
   line-height: 1.1;
 }
 
-.header p {
+.section-description {
   margin: 0;
   font-size: 1rem;
   color: var(--contrast-brown);
   max-width: 520px;
   line-height: 1.7;
+}
+
+.section-description :deep(p) {
+  margin: 0.5rem 0;
 }
 
 .grid {

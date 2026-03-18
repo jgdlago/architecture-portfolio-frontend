@@ -8,6 +8,7 @@ import AboutSection from '@/components/sections/AboutSection.vue'
 import ContactSection from '@/components/sections/ContactSection.vue'
 import ExperienceSection from '@/components/sections/ExperienceSection.vue'
 import ProcessSection from '@/components/sections/ProcessSection.vue'
+import RichTextEditor from '@/components/ui/RichTextEditor.vue'
 import { useToast } from '@/composables/useToast'
 import { getApiErrorMessage } from '@/utils/apiErrors'
 import { MoonIcon, SunIcon } from '@heroicons/vue/24/outline'
@@ -239,7 +240,7 @@ onMounted(load)
             </div>
             <div class="field">
                 <label>DescriÃ§Ã£o</label>
-                <textarea v-model="featuredProjects.description" rows="3"></textarea>
+                <RichTextEditor v-model="featuredProjects.description" min-height="140px" />
             </div>
             <button type="submit" class="btn-save" :disabled="isSaving">Salvar Projetos Destaque</button>
 
@@ -264,7 +265,7 @@ onMounted(load)
             <h2>Sobre</h2>
             <div class="field">
                 <label>Texto</label>
-                <textarea v-model="about.text" rows="4"></textarea>
+                <RichTextEditor v-model="about.text" min-height="200px" />
             </div>
             <div class="field">
                 <label>Imagem</label>

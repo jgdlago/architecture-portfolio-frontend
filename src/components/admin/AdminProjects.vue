@@ -7,6 +7,8 @@ import {
     fetchAdminCategories,
     fetchAdminProject,
     fetchAdminProjects,
+    reorderAdminProjects,
+    reorderProjectImages,
     updateAdminProject,
     updateProjectImage,
     uploadFile,
@@ -18,6 +20,7 @@ import {
 import { resolveMediaUrl } from '@/api/http'
 import ImageUploader from '@/components/admin/ImageUploader.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
+import RichTextEditor from '@/components/ui/RichTextEditor.vue'
 import { useToast } from '@/composables/useToast'
 import { getApiErrorMessage, getFieldErrors, type FieldErrors } from '@/utils/apiErrors'
 import { computed, onMounted, ref } from 'vue'
@@ -42,6 +45,9 @@ const pendingImages = ref<PendingImage[]>([])
 const showForm = ref(false)
 const fieldErrors = ref<FieldErrors>({})
 const deletingProjectId = ref<number | null>(null)
+const draggingProjectId = ref<number | null>(null)
+const draggingImageId = ref<number | null>(null)
+const draggingPendingImagePath = ref<string | null>(null)
 
 const form = ref(emptyForm())
 
@@ -71,6 +77,109 @@ const loadProjects = async () => {
     } finally {
         isLoading.value = false
     }
+}
+
+const reorderProjectList = async () => {
+    try {
+        await reorderAdminProjects(projects.value.map((project) => project.id))
+        toast.success('Ordem dos projetos atualizada.')
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao reordenar projetos.'))
+        await loadProjects()
+    }
+}
+
+const moveById = <T extends { id: number }>(list: T[], draggedId: number, targetId: number): T[] => {
+    const from = list.findIndex((item) => item.id === draggedId)
+    const to = list.findIndex((item) => item.id === targetId)
+
+    if (from < 0 || to < 0 || from === to) {
+        return list
+    }
+
+    const copy = [...list]
+    const [dragged] = copy.splice(from, 1)
+    copy.splice(to, 0, dragged)
+    return copy
+}
+
+const onProjectDragStart = (projectId: number) => {
+    draggingProjectId.value = projectId
+}
+
+const onProjectDrop = async (targetId: number) => {
+    const draggedId = draggingProjectId.value
+    draggingProjectId.value = null
+
+    if (!draggedId || draggedId === targetId) {
+        return
+    }
+
+    projects.value = moveById(projects.value, draggedId, targetId)
+    await reorderProjectList()
+}
+
+const reorderCurrentProjectImages = async () => {
+    if (!editingProject.value) {
+        return
+    }
+
+    try {
+        await reorderProjectImages(editingProject.value.id, projectImages.value.map((img) => img.id))
+        toast.success('Ordem da galeria atualizada.')
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao reordenar galeria.'))
+        const full = await fetchAdminProject(editingProject.value.id)
+        projectImages.value = full.images ?? []
+    }
+}
+
+const onGalleryImageDragStart = (imageId: number) => {
+    draggingImageId.value = imageId
+}
+
+const onGalleryImageDrop = async (targetId: number) => {
+    const draggedId = draggingImageId.value
+    draggingImageId.value = null
+
+    if (!draggedId || draggedId === targetId) {
+        return
+    }
+
+    projectImages.value = moveById(projectImages.value, draggedId, targetId)
+    await reorderCurrentProjectImages()
+}
+
+const movePendingByPath = (draggedPath: string, targetPath: string) => {
+    const from = pendingImages.value.findIndex((item) => item.path === draggedPath)
+    const to = pendingImages.value.findIndex((item) => item.path === targetPath)
+
+    if (from < 0 || to < 0 || from === to) {
+        return
+    }
+
+    const reordered = [...pendingImages.value]
+    const [dragged] = reordered.splice(from, 1)
+    reordered.splice(to, 0, dragged)
+    pendingImages.value = reordered.map((item) => ({
+        ...item,
+        isCover: item.path === form.value.cover_image_path,
+    }))
+}
+
+const onPendingImageDragStart = (imagePath: string) => {
+    draggingPendingImagePath.value = imagePath
+}
+
+const onPendingImageDrop = (targetPath: string) => {
+    const draggedPath = draggingPendingImagePath.value
+    draggingPendingImagePath.value = null
+
+    if (!draggedPath || draggedPath === targetPath) {
+        return
+    }
+
+    movePendingByPath(draggedPath, targetPath)
 }
 
 const clearErrors = () => {
@@ -367,7 +476,8 @@ onMounted(loadProjects)
 
                 <div class="field">
                     <label>Descrição completa</label>
-                    <textarea v-model="form.description" rows="4"></textarea>
+                    <RichTextEditor v-model="form.description" placeholder="Conte a história do projeto, soluções adotadas e materiais." min-height="220px" />
+                    <small class="field-help">Dica: use títulos, listas e links para melhorar leitura.</small>
                     <small v-if="errorFor('description')" class="field-error">{{ errorFor('description') }}</small>
                 </div>
 
@@ -381,7 +491,15 @@ onMounted(loadProjects)
                     <label>Galeria de Imagens</label>
                     <div class="gallery-grid">
                         <template v-if="isEditing">
-                            <div v-for="img in projectImages" :key="img.id" class="gallery-item">
+                            <div
+                                v-for="img in projectImages"
+                                :key="img.id"
+                                class="gallery-item"
+                                draggable="true"
+                                @dragstart="onGalleryImageDragStart(img.id)"
+                                @dragover.prevent
+                                @drop.prevent="onGalleryImageDrop(img.id)"
+                            >
                                 <img :src="resolveMediaUrl(img.image_path)" :alt="img.alt_text || 'Imagem'" />
                                 <div class="gallery-actions">
                                     <button
@@ -398,7 +516,15 @@ onMounted(loadProjects)
                         </template>
 
                         <template v-else>
-                            <div v-for="img in pendingImages" :key="img.path" class="gallery-item">
+                            <div
+                                v-for="img in pendingImages"
+                                :key="img.path"
+                                class="gallery-item"
+                                draggable="true"
+                                @dragstart="onPendingImageDragStart(img.path)"
+                                @dragover.prevent
+                                @drop.prevent="onPendingImageDrop(img.path)"
+                            >
                                 <img :src="img.url" alt="Imagem" />
                                 <div class="gallery-actions">
                                     <button
@@ -447,7 +573,16 @@ onMounted(loadProjects)
             </div>
 
             <ul class="project-list">
-                <li v-for="project in projects" :key="project.id" class="project-item">
+                <li
+                    v-for="project in projects"
+                    :key="project.id"
+                    class="project-item"
+                    draggable="true"
+                    @dragstart="onProjectDragStart(project.id)"
+                    @dragover.prevent
+                    @drop.prevent="onProjectDrop(project.id)"
+                >
+                    <div class="drag-handle" aria-hidden="true">⋮⋮</div>
                     <div class="project-thumb">
                         <img v-if="project.cover_image_path" :src="resolveMediaUrl(project.cover_image_path)" :alt="project.title" />
                         <div v-else class="no-image">Sem imagem</div>
@@ -547,6 +682,18 @@ onMounted(loadProjects)
     border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
     border-radius: 10px;
     background: color-mix(in srgb, var(--background) 94%, black 6%);
+    cursor: grab;
+}
+
+.project-item:active {
+    cursor: grabbing;
+}
+
+.drag-handle {
+    color: var(--contrast-brown);
+    font-size: 1rem;
+    letter-spacing: -0.08em;
+    user-select: none;
 }
 
 .project-thumb {
@@ -708,6 +855,11 @@ onMounted(loadProjects)
     overflow: hidden;
     border: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
     background: color-mix(in srgb, var(--background) 92%, black 8%);
+    cursor: grab;
+}
+
+.gallery-item:active {
+    cursor: grabbing;
 }
 
 .gallery-item img {

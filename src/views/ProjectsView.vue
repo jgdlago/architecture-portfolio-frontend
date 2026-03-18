@@ -6,7 +6,7 @@ import Navbar from '@/components/layout/Navbar.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
 import { applySeo } from '@/composables/useSeo'
 import { computed, nextTick, onMounted, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { resolveMediaUrl } from '../api/http'
 import { fetchProjects, type ProjectListItem } from '../api/projects'
 
@@ -29,6 +29,7 @@ const footerServices = computed(() => settings.value.footer_services ?? {})
 const navbar = computed(() => settings.value.navbar ?? {})
 const seo = computed(() => settings.value.seo ?? {})
 const { observe } = useScrollReveal()
+const router = useRouter()
 
 const loadProjects = async (category?: string) => {
   const requestId = ++latestLoadRequest
@@ -53,6 +54,24 @@ const loadProjects = async (category?: string) => {
 const setCategory = (slug?: string) => {
   activeCategory.value = slug
   loadProjects(slug)
+}
+
+const navigateToProject = async (event: MouseEvent, slug: string) => {
+  event.preventDefault()
+  sessionStorage.setItem('portfolio-transition-project', slug)
+
+  const doc = document as Document & {
+    startViewTransition?: (callback: () => Promise<void> | void) => { finished: Promise<void> }
+  }
+
+  if (typeof doc.startViewTransition === 'function') {
+    await doc.startViewTransition(async () => {
+      await router.push(`/projects/${slug}`)
+    }).finished
+    return
+  }
+
+  await router.push(`/projects/${slug}`)
 }
 
 onMounted(async () => {
@@ -116,10 +135,10 @@ onMounted(async () => {
 
     <section v-else class="grid">
       <RouterLink v-for="(project, index) in filteredProjects" :key="project.id" :to="`/projects/${project.slug}`"
-        class="card reveal-slide-up" :style="{ transitionDelay: `${Math.min(index * 65, 320)}ms` }">
+        class="card reveal-slide-up" :style="{ transitionDelay: `${Math.min(index * 65, 320)}ms` }" @click="navigateToProject($event, project.slug)">
         <div class="card-image">
           <img v-if="project.cover_image_path" :src="resolveMediaUrl(project.cover_image_path)"
-            :alt="project.title" loading="lazy" decoding="async" />
+            :alt="project.title" loading="lazy" decoding="async" :style="{ viewTransitionName: `project-cover-${project.slug}` }" />
           <div v-else class="no-image">Sem imagem</div>
           <span v-if="project.category" class="card-category">{{ project.category }}</span>
 

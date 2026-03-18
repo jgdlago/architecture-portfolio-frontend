@@ -138,6 +138,10 @@ export async function deleteAdminCategory(id: number): Promise<void> {
     await http.delete(`/admin/project-categories/${id}`)
 }
 
+export async function reorderAdminCategories(ids: number[]): Promise<void> {
+    await http.put('/admin/project-categories/reorder', { ids })
+}
+
 // Projects
 export async function fetchAdminProjects(): Promise<AdminProject[]> {
     const { data } = await http.get<{ data: AdminProject[] }>('/admin/projects')
@@ -163,6 +167,10 @@ export async function deleteAdminProject(id: number): Promise<void> {
     await http.delete(`/admin/projects/${id}`)
 }
 
+export async function reorderAdminProjects(ids: number[]): Promise<void> {
+    await http.put('/admin/projects/reorder', { ids })
+}
+
 // Project Images
 export async function fetchProjectImages(projectId: number): Promise<AdminProjectImage[]> {
     const { data } = await http.get<{ data: AdminProjectImage[] }>(`/admin/projects/${projectId}/images`)
@@ -185,6 +193,10 @@ export async function updateProjectImage(
 
 export async function deleteProjectImage(projectId: number, imageId: number): Promise<void> {
     await http.delete(`/admin/projects/${projectId}/images/${imageId}`)
+}
+
+export async function reorderProjectImages(projectId: number, ids: number[]): Promise<void> {
+    await http.put(`/admin/projects/${projectId}/images/reorder`, { ids })
 }
 
 // File Upload
