@@ -99,6 +99,11 @@ const moveById = <T extends { id: number }>(list: T[], draggedId: number, target
 
     const copy = [...list]
     const [dragged] = copy.splice(from, 1)
+
+    if (!dragged) {
+        return list
+    }
+
     copy.splice(to, 0, dragged)
     return copy
 }
@@ -160,6 +165,11 @@ const movePendingByPath = (draggedPath: string, targetPath: string) => {
 
     const reordered = [...pendingImages.value]
     const [dragged] = reordered.splice(from, 1)
+
+    if (!dragged) {
+        return
+    }
+
     reordered.splice(to, 0, dragged)
     pendingImages.value = reordered.map((item) => ({
         ...item,

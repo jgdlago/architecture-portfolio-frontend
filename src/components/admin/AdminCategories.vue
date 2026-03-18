@@ -97,6 +97,11 @@ const onDrop = async (targetId: number) => {
 
     const reordered = [...categories.value]
     const [dragged] = reordered.splice(from, 1)
+
+    if (!dragged) {
+        return
+    }
+
     reordered.splice(to, 0, dragged)
     categories.value = reordered
 
