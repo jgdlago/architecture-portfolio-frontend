@@ -1,4 +1,5 @@
 import '@/assets/styles/theme.css'
+import { loadAndApplyTheme } from '@/composables/useCustomTheme'
 import '@/style.css'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
@@ -14,6 +15,6 @@ app.use(router)
 
 const auth = useAuthStore(pinia)
 
-auth.bootstrap().finally(() => {
+Promise.all([auth.bootstrap(), loadAndApplyTheme()]).finally(() => {
     app.mount('#app')
 })

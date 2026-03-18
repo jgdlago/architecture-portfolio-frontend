@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminCategories from '@/components/admin/AdminCategories.vue'
+import AdminCustomization from '@/components/admin/AdminCustomization.vue'
 import AdminDashboard from '@/components/admin/AdminDashboard.vue'
 import AdminMessages from '@/components/admin/AdminMessages.vue'
 import AdminProfile from '@/components/admin/AdminProfile.vue'
@@ -16,6 +17,7 @@ import {
     MoonIcon,
     RectangleGroupIcon,
     SunIcon,
+    SwatchIcon,
     UserCircleIcon,
     XMarkIcon,
 } from '@heroicons/vue/24/outline'
@@ -26,7 +28,7 @@ const router = useRouter()
 const auth = useAuthStore()
 const { isDark, toggle } = useTheme()
 
-const activeTab = ref<'dashboard' | 'projects' | 'categories' | 'messages' | 'settings' | 'profile'>('dashboard')
+const activeTab = ref<'dashboard' | 'projects' | 'categories' | 'messages' | 'settings' | 'customization' | 'profile'>('dashboard')
 const mobileMenuOpen = ref(false)
 
 const navItems: Array<{ key: typeof activeTab.value; label: string; icon: any }> = [
@@ -35,6 +37,7 @@ const navItems: Array<{ key: typeof activeTab.value; label: string; icon: any }>
     { key: 'categories', label: 'Categorias', icon: RectangleGroupIcon },
     { key: 'messages', label: 'Mensagens', icon: InboxIcon },
     { key: 'settings', label: 'Conteudo', icon: Cog6ToothIcon },
+    { key: 'customization', label: 'Aparencia', icon: SwatchIcon },
     { key: 'profile', label: 'Perfil', icon: UserCircleIcon },
 ]
 
@@ -95,6 +98,7 @@ const selectTab = (tab: typeof activeTab.value) => {
                 <AdminCategories v-else-if="activeTab === 'categories'" />
                 <AdminMessages v-else-if="activeTab === 'messages'" />
                 <AdminSettings v-else-if="activeTab === 'settings'" />
+                <AdminCustomization v-else-if="activeTab === 'customization'" />
                 <AdminProfile v-else />
             </div>
         </section>
