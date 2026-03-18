@@ -2,6 +2,7 @@
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
+import { applySeo } from '@/composables/useSeo'
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import axios from 'axios'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -79,6 +80,19 @@ onMounted(async () => {
   try {
     project.value = await fetchProjectBySlug(slug.value)
     loadError.value = false
+
+    if (project.value) {
+      const seoDescription = project.value.short_description
+        || project.value.description
+        || `Conheça o projeto ${project.value.title}.`
+
+      applySeo({
+        title: `${project.value.title} | Projetos`,
+        description: seoDescription,
+        image: resolveMediaUrl(project.value.cover_image_path),
+        path: `/projects/${project.value.slug}`,
+      })
+    }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       project.value = null
@@ -127,7 +141,7 @@ onUnmounted(() => {
       </div>
 
       <div v-if="allImages.length" class="hero-image reveal-fade" @click="openLightbox(0)">
-        <img :src="resolveMediaUrl(allImages[0]!.image_path)" :alt="allImages[0]!.alt_text || project.title" />
+        <img :src="resolveMediaUrl(allImages[0]!.image_path)" :alt="allImages[0]!.alt_text || project.title" loading="eager" fetchpriority="high" decoding="async" />
       </div>
 
       <div class="content-grid container">
@@ -179,6 +193,8 @@ onUnmounted(() => {
             <img
               :src="resolveMediaUrl(image.image_path)"
               :alt="image.alt_text || project.title"
+              loading="lazy"
+              decoding="async"
             />
           </button>
         </div>

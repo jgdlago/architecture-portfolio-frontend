@@ -1,7 +1,7 @@
 <template>
   <section class="about container">
     <div class="image reveal-slide-left">
-      <img v-if="image" :src="image" alt="Arquiteta" />
+      <img v-if="image" :src="image" alt="Arquiteta" loading="lazy" decoding="async" />
       <div v-else class="image-placeholder">Imagem nao cadastrada</div>
     </div>
 

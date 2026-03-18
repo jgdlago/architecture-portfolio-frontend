@@ -4,6 +4,7 @@ import { resolveMediaUrl } from '@/api/http'
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
+import { applySeo } from '@/composables/useSeo'
 import { computed, onMounted, ref } from 'vue'
 
 const about = ref<AboutPayload | null>(null)
@@ -12,6 +13,20 @@ const isLoading = ref(true)
 onMounted(async () => {
   try {
     about.value = await fetchAboutContent()
+
+    const seoTitle = about.value?.user?.name
+      ? `${about.value.user.name} | Sobre`
+      : 'Sobre | Portfólio de Arquitetura'
+    const seoDescription = about.value?.profile?.bio
+      || about.value?.settings?.text
+      || 'Conheça a trajetória, experiência e visão da arquiteta.'
+
+    applySeo({
+      title: seoTitle,
+      description: seoDescription,
+      image: avatarUrl.value,
+      path: '/about',
+    })
   } finally {
     isLoading.value = false
   }
@@ -44,7 +59,7 @@ function formatDate(date: string): string {
     <template v-else-if="about">
       <section class="about-hero reveal-slide-up">
         <div v-if="avatarUrl" class="avatar">
-          <img :src="avatarUrl" :alt="displayName" />
+          <img :src="avatarUrl" :alt="displayName" loading="lazy" decoding="async" />
         </div>
 
         <div class="hero-text">

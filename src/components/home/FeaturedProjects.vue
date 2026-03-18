@@ -15,7 +15,7 @@
         :to="`/projects/${project.slug}`"
       >
         <div class="image-wrapper">
-          <img v-if="resolveMediaUrl(project.cover_image_path)" :src="resolveMediaUrl(project.cover_image_path)" :alt="project.title" />
+          <img v-if="resolveMediaUrl(project.cover_image_path)" :src="resolveMediaUrl(project.cover_image_path)" :alt="project.title" loading="lazy" decoding="async" />
           <div v-else class="no-image">Sem imagem cadastrada</div>
           <span v-if="project.category" class="card-category">{{ project.category }}</span>
 

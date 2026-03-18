@@ -4,6 +4,7 @@ import { http } from '@/api/http'
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
+import { applySeo } from '@/composables/useSeo'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { resolveMediaUrl } from '../api/http'
@@ -64,14 +65,11 @@ onMounted(async () => {
     categories.value = categoriesResponse.data
     settings.value = homeContent.settings ?? {}
 
-    if (seo.value.title) {
-      document.title = `${seo.value.title} | Projetos`
-    }
-
-    const metaDescription = document.querySelector('meta[name="description"]')
-    if (metaDescription && seo.value.description) {
-      metaDescription.setAttribute('content', seo.value.description)
-    }
+    applySeo({
+      title: seo.value.title ? `${seo.value.title} | Projetos` : 'Projetos | Portfólio de Arquitetura',
+      description: seo.value.description || 'Coleção de projetos residenciais e comerciais com foco em funcionalidade, estética e contexto.',
+      path: '/projects',
+    })
   } catch { /* ignore */ }
   await loadProjects()
 })
@@ -121,7 +119,7 @@ onMounted(async () => {
         class="card reveal-slide-up" :style="{ transitionDelay: `${Math.min(index * 65, 320)}ms` }">
         <div class="card-image">
           <img v-if="project.cover_image_path" :src="resolveMediaUrl(project.cover_image_path)"
-            :alt="project.title" />
+            :alt="project.title" loading="lazy" decoding="async" />
           <div v-else class="no-image">Sem imagem</div>
           <span v-if="project.category" class="card-category">{{ project.category }}</span>
 
