@@ -71,3 +71,58 @@
     --hero-text: #ffffff;
     --hero-overlay: rgba(0, 0, 0, 0.65);
 }
+
+/* Smooth visual transition when switching between light and dark themes. */
+html.theme-transitioning,
+html.theme-transitioning * {
+    transition-property: background-color, color, border-color, box-shadow, fill, stroke;
+    transition-duration: 0.44s;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.theme-transitioning body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background: radial-gradient(circle at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%),
+            color-mix(in srgb, var(--contrast-gold) 28%, transparent) 0%,
+            color-mix(in srgb, var(--accent) 14%, transparent) 26%,
+            transparent 60%);
+    clip-path: circle(0 at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%));
+    animation: theme-ripple-reveal 0.52s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes theme-ripple-reveal {
+    0% {
+        opacity: 0.05;
+        clip-path: circle(0 at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%));
+    }
+
+    28% {
+        opacity: 0.26;
+    }
+
+    62% {
+        opacity: 0.18;
+    }
+
+    100% {
+        opacity: 0;
+        clip-path: circle(170vmax at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    html.theme-transitioning,
+    html.theme-transitioning * {
+        transition: none !important;
+    }
+
+    html.theme-transitioning body::before {
+        animation: none;
+        opacity: 0;
+    }
+}

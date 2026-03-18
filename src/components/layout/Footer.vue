@@ -10,21 +10,21 @@
         <div class="footer-section contact">
           <h4>Contato</h4>
           <ul>
-            <li>{{ email }}</li>
-            <li>{{ phone }}</li>
-            <li>{{ city }}</li>
+            <li v-if="email">{{ email }}</li>
+            <li v-if="phone">{{ phone }}</li>
+            <li v-if="city">{{ city }}</li>
           </ul>
         </div>
 
-        <div class="footer-section social">
+        <div v-if="showSocial" class="footer-section social">
           <h4>Redes</h4>
           <ul>
-            <li><a :href="instagramUrl" target="_blank">Instagram</a></li>
-            <li><a :href="linkedinUrl" target="_blank">LinkedIn</a></li>
+            <li v-if="showInstagram"><a :href="instagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+            <li v-if="showLinkedIn"><a :href="linkedinUrl" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
           </ul>
         </div>
 
-        <div class="footer-section services">
+        <div v-if="servicesItems.length" class="footer-section services">
           <h4>{{ servicesTitle }}</h4>
           <ul>
             <li v-for="service in servicesItems" :key="service">{{ service }}</li>
@@ -33,14 +33,17 @@
       </div>
 
       <div class="footer-bottom">
-        <p>{{ copyrightText }}</p>
-        <p>{{ cau }}</p>
+        <p v-if="copyrightText">{{ copyrightText }}</p>
+        <p v-if="cau">{{ cau }}</p>
       </div>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
+const props =
 withDefaults(
   defineProps<{
     brandName?: string
@@ -69,6 +72,10 @@ withDefaults(
     servicesItems: () => ['Projetos Arquitetônicos', 'Interiores', 'Consultoria'],
   },
 )
+
+const showInstagram = computed(() => Boolean(props.instagramUrl && props.instagramUrl !== '#'))
+const showLinkedIn = computed(() => Boolean(props.linkedinUrl && props.linkedinUrl !== '#'))
+const showSocial = computed(() => showInstagram.value || showLinkedIn.value)
 </script>
 
 <style scoped>
@@ -119,7 +126,7 @@ withDefaults(
 
 .footer-section li {
   font-size: 0.86rem;
-  line-height: 1.9;
+  line-height: 1.65;
   color: var(--primary-text);
 }
 
@@ -162,22 +169,48 @@ withDefaults(
 
 @media (max-width: 640px) {
   .footer-wrapper {
-    padding: var(--space-16) 0 var(--space-8);
+    padding: var(--space-10) 0 var(--space-6);
   }
 
   .footer-content {
     grid-template-columns: 1fr;
-    gap: var(--space-6);
+    gap: var(--space-4);
+    margin-bottom: var(--space-7);
   }
 
   .footer-section.brand {
     grid-column: auto;
   }
 
+  .footer-section.brand h3 {
+    font-size: clamp(2rem, 9vw, 2.4rem);
+  }
+
+  .footer-section.brand p {
+    margin-top: 0.35rem;
+    letter-spacing: 0.14em;
+    font-size: 0.73rem;
+  }
+
+  .footer-section h4 {
+    margin-bottom: var(--space-2);
+    letter-spacing: 0.18em;
+  }
+
+  .footer-section li {
+    font-size: 0.82rem;
+    line-height: 1.58;
+  }
+
   .footer-bottom {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    padding-top: var(--space-4);
     text-align: center;
+  }
+
+  .footer-bottom p {
+    letter-spacing: 0.08em;
   }
 }
 </style>

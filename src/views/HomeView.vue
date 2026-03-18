@@ -5,6 +5,7 @@ import FeaturedProjects from '@/components/home/FeaturedProjects.vue';
 import HeroSection from '@/components/home/HeroSection.vue';
 import Navbar from '@/components/layout/Navbar.vue';
 import AboutSection from '@/components/sections/AboutSection.vue';
+import { applySeo } from '@/composables/useSeo';
 import { computed, onMounted, ref } from 'vue';
 import Footer from '../components/layout/Footer.vue';
 import ContactSection from '../components/sections/ContactSection.vue';
@@ -29,16 +30,16 @@ const process = computed(() => settings.value.process ?? {})
 const experience = computed(() => settings.value.experience ?? {})
 const contact = computed(() => settings.value.contact ?? {})
 
-const applySeo = () => {
+const applyHomeSeo = () => {
   const seoTitle = seo.value.title || 'Portfólio de Arquitetura'
   const seoDescription = seo.value.description || 'Portfólio de arquitetura com projetos residenciais e comerciais.'
 
-  document.title = seoTitle
-
-  const tag = document.querySelector('meta[name="description"]')
-  if (tag) {
-    tag.setAttribute('content', seoDescription)
-  }
+  applySeo({
+    title: seoTitle,
+    description: seoDescription,
+    image: heroBackgroundImage.value,
+    path: '/',
+  })
 }
 
 onMounted(async () => {
@@ -54,7 +55,7 @@ onMounted(async () => {
     featuredProjects.value = []
   }
 
-  applySeo()
+  applyHomeSeo()
 })
 </script>
 
@@ -94,7 +95,8 @@ onMounted(async () => {
       :instagram-url="contact.instagram_url"
       :linkedin-url="contact.linkedin_url"
       :email="contact.email"
-      :whatsapp-url="contact.whatsapp_url"
+      :whatsapp-number="contact.whatsapp_number"
+      :whatsapp-message="contact.whatsapp_message"
     />
   </div>
 

@@ -4,8 +4,9 @@ import { http } from '@/api/http'
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
+import { applySeo } from '@/composables/useSeo'
 import { computed, nextTick, onMounted, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { resolveMediaUrl } from '../api/http'
 import { fetchProjects, type ProjectListItem } from '../api/projects'
 
@@ -28,6 +29,7 @@ const footerServices = computed(() => settings.value.footer_services ?? {})
 const navbar = computed(() => settings.value.navbar ?? {})
 const seo = computed(() => settings.value.seo ?? {})
 const { observe } = useScrollReveal()
+const router = useRouter()
 
 const loadProjects = async (category?: string) => {
   const requestId = ++latestLoadRequest
@@ -54,6 +56,24 @@ const setCategory = (slug?: string) => {
   loadProjects(slug)
 }
 
+const navigateToProject = async (event: MouseEvent, slug: string) => {
+  event.preventDefault()
+  sessionStorage.setItem('portfolio-transition-project', slug)
+
+  const doc = document as Document & {
+    startViewTransition?: (callback: () => Promise<void> | void) => { finished: Promise<void> }
+  }
+
+  if (typeof doc.startViewTransition === 'function') {
+    await doc.startViewTransition(async () => {
+      await router.push(`/projects/${slug}`)
+    }).finished
+    return
+  }
+
+  await router.push(`/projects/${slug}`)
+}
+
 onMounted(async () => {
   try {
     const [categoriesResponse, homeContent] = await Promise.all([
@@ -64,14 +84,11 @@ onMounted(async () => {
     categories.value = categoriesResponse.data
     settings.value = homeContent.settings ?? {}
 
-    if (seo.value.title) {
-      document.title = `${seo.value.title} | Projetos`
-    }
-
-    const metaDescription = document.querySelector('meta[name="description"]')
-    if (metaDescription && seo.value.description) {
-      metaDescription.setAttribute('content', seo.value.description)
-    }
+    applySeo({
+      title: seo.value.title ? `${seo.value.title} | Projetos` : 'Projetos | Portfólio de Arquitetura',
+      description: seo.value.description || 'Coleção de projetos residenciais e comerciais com foco em funcionalidade, estética e contexto.',
+      path: '/projects',
+    })
   } catch { /* ignore */ }
   await loadProjects()
 })
@@ -118,10 +135,10 @@ onMounted(async () => {
 
     <section v-else class="grid">
       <RouterLink v-for="(project, index) in filteredProjects" :key="project.id" :to="`/projects/${project.slug}`"
-        class="card reveal-slide-up" :style="{ transitionDelay: `${Math.min(index * 65, 320)}ms` }">
+        class="card reveal-slide-up" :style="{ transitionDelay: `${Math.min(index * 65, 320)}ms` }" @click="navigateToProject($event, project.slug)">
         <div class="card-image">
           <img v-if="project.cover_image_path" :src="resolveMediaUrl(project.cover_image_path)"
-            :alt="project.title" />
+            :alt="project.title" loading="lazy" decoding="async" :style="{ viewTransitionName: `project-cover-${project.slug}` }" />
           <div v-else class="no-image">Sem imagem</div>
           <span v-if="project.category" class="card-category">{{ project.category }}</span>
 
@@ -368,7 +385,30 @@ onMounted(async () => {
 
 @media (max-width: 640px) {
   .projects-page {
-    padding: var(--space-12) 0 var(--space-10);
+    padding: var(--space-10) 0 var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .page-header h1 {
+    font-size: clamp(1.95rem, 8vw, 2.5rem);
+  }
+
+  .filters {
+    margin-bottom: var(--space-6);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: thin;
+  }
+
+  .filters button {
+    flex: 0 0 auto;
+    padding: 0.55rem 1rem;
+    letter-spacing: 0.12em;
+    font-size: 0.7rem;
   }
 
   .loading-grid,
@@ -376,9 +416,47 @@ onMounted(async () => {
     grid-template-columns: 1fr;
   }
 
+  .grid {
+    gap: var(--space-6);
+  }
+
+  .card {
+    border-bottom: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
+    padding-bottom: var(--space-6);
+  }
+
   .card-overlay {
-    opacity: 1;
-    padding: var(--space-5);
+    display: none;
+  }
+
+  .card-category {
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    padding: 0.22rem 0.54rem;
+  }
+
+  .card-body {
+    margin-top: 0.8rem;
+  }
+
+  .card-body h3 {
+    font-size: 1.12rem;
+    line-height: 1.15;
+    margin-bottom: 0.45rem;
+  }
+
+  .card-body p {
+    margin-bottom: 0.7rem;
+  }
+
+  .card-meta {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    letter-spacing: 0.14em;
+  }
+
+  .empty {
+    padding: var(--space-6);
   }
 }
 </style>

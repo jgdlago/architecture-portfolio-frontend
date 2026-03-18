@@ -1,11 +1,39 @@
 import { onMounted, ref } from 'vue'
 
 const isDark = ref(false)
+let transitionTimer: number | null = null
 
 export function useTheme() {
-    const toggle = () => {
+    const toggle = (event?: MouseEvent) => {
+        startThemeTransition(event)
         isDark.value = !isDark.value
         updateTheme()
+    }
+
+    const startThemeTransition = (event?: MouseEvent) => {
+        const html = document.documentElement
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+        if (reduceMotion) {
+            return
+        }
+
+        const originX = event?.clientX ?? window.innerWidth / 2
+        const originY = event?.clientY ?? window.innerHeight / 2
+
+        html.style.setProperty('--theme-origin-x', `${originX}px`)
+        html.style.setProperty('--theme-origin-y', `${originY}px`)
+
+        html.classList.add('theme-transitioning')
+
+        if (transitionTimer !== null) {
+            window.clearTimeout(transitionTimer)
+        }
+
+        transitionTimer = window.setTimeout(() => {
+            html.classList.remove('theme-transitioning')
+            transitionTimer = null
+        }, 560)
     }
 
     const updateTheme = () => {

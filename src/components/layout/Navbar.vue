@@ -60,7 +60,7 @@ watch(() => route.fullPath, () => {
         <RouterLink :to="{ path: '/', hash: '#contact' }" :class="{ active: isSectionActive('#contact') }">{{ contactLabel }}</RouterLink>
       </nav>
 
-      <button class="theme-toggle" @click="toggle" aria-label="Alternar tema">
+      <button class="theme-toggle" @click="toggle($event)" aria-label="Alternar tema">
         <SunIcon v-if="isDark" />
         <MoonIcon v-else />
       </button>

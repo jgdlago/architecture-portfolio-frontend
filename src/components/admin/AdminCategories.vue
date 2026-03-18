@@ -3,6 +3,7 @@ import {
     createAdminCategory,
     deleteAdminCategory,
     fetchAdminCategories,
+    reorderAdminCategories,
     type AdminCategory,
 } from '@/api/admin'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
@@ -17,6 +18,7 @@ const isSaving = ref(false)
 const form = ref({ name: '', slug: '' })
 const fieldErrors = ref<FieldErrors>({})
 const deletingId = ref<number | null>(null)
+const draggingId = ref<number | null>(null)
 
 const load = async () => {
     isLoading.value = true
@@ -74,6 +76,44 @@ const autoSlug = () => {
         .replace(/^-|-$/g, '')
 }
 
+const onDragStart = (id: number) => {
+    draggingId.value = id
+}
+
+const onDrop = async (targetId: number) => {
+    const draggedId = draggingId.value
+    draggingId.value = null
+
+    if (!draggedId || draggedId === targetId) {
+        return
+    }
+
+    const from = categories.value.findIndex((cat) => cat.id === draggedId)
+    const to = categories.value.findIndex((cat) => cat.id === targetId)
+
+    if (from < 0 || to < 0 || from === to) {
+        return
+    }
+
+    const reordered = [...categories.value]
+    const [dragged] = reordered.splice(from, 1)
+
+    if (!dragged) {
+        return
+    }
+
+    reordered.splice(to, 0, dragged)
+    categories.value = reordered
+
+    try {
+        await reorderAdminCategories(categories.value.map((cat) => cat.id))
+        toast.success('Ordem das categorias atualizada.')
+    } catch (error) {
+        toast.error(getApiErrorMessage(error, 'Erro ao reordenar categorias.'))
+        await load()
+    }
+}
+
 onMounted(load)
 </script>
 
@@ -97,7 +137,15 @@ onMounted(load)
         </div>
 
         <ul class="list">
-            <li v-for="cat in categories" :key="cat.id">
+            <li
+                v-for="cat in categories"
+                :key="cat.id"
+                draggable="true"
+                @dragstart="onDragStart(cat.id)"
+                @dragover.prevent
+                @drop.prevent="onDrop(cat.id)"
+            >
+                <span class="drag-handle" aria-hidden="true">⋮⋮</span>
                 <div>
                     <strong>{{ cat.name }}</strong>
                     <small>{{ cat.slug }}</small>
@@ -201,6 +249,18 @@ h3 {
     border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--surface) 96%, transparent);
     box-shadow: var(--shadow-sm);
+    cursor: grab;
+}
+
+.list li:active {
+    cursor: grabbing;
+}
+
+.drag-handle {
+    color: var(--contrast-brown);
+    font-size: 0.95rem;
+    letter-spacing: -0.07em;
+    user-select: none;
 }
 
 .list small {

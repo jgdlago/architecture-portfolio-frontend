@@ -1,13 +1,13 @@
 <template>
   <section class="about container">
     <div class="image reveal-slide-left">
-      <img v-if="image" :src="image" alt="Arquiteta" />
+      <img v-if="image" :src="image" alt="Arquiteta" loading="lazy" decoding="async" />
       <div v-else class="image-placeholder">Imagem nao cadastrada</div>
     </div>
 
     <div class="content reveal-slide-right">
       <h2>Sobre</h2>
-      <p>{{ text }}</p>
+      <div class="about-text" v-html="text" />
     </div>
   </section>
 </template>
@@ -69,11 +69,15 @@ useScrollReveal()
   line-height: 1.1;
 }
 
-.content p {
+.about-text {
   margin: 0;
   font-size: 1.04rem;
   line-height: 1.9;
   color: var(--contrast-brown);
+}
+
+.about-text :deep(p) {
+  margin: 0.7rem 0;
 }
 
 @media (max-width: 1024px) {

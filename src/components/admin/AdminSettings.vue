@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { fetchAdminSettings, uploadFile, upsertAdminSetting } from '@/api/admin'
 import { resolveMediaUrl } from '@/api/http'
 import FeaturedProjects from '@/components/home/FeaturedProjects.vue'
@@ -8,8 +8,10 @@ import AboutSection from '@/components/sections/AboutSection.vue'
 import ContactSection from '@/components/sections/ContactSection.vue'
 import ExperienceSection from '@/components/sections/ExperienceSection.vue'
 import ProcessSection from '@/components/sections/ProcessSection.vue'
+import RichTextEditor from '@/components/ui/RichTextEditor.vue'
 import { useToast } from '@/composables/useToast'
 import { getApiErrorMessage } from '@/utils/apiErrors'
+import { MoonIcon, SunIcon } from '@heroicons/vue/24/outline'
 import { computed, onMounted, ref } from 'vue'
 
 type SiteSettingItem = {
@@ -25,27 +27,35 @@ const isSaving = ref(false)
 const hero = ref({ title: '', subtitle: '', image_path: '' })
 const navbar = ref({ brand_name: '', brand_role: '', home_label: '', projects_label: '', about_label: '', contact_label: '' })
 const about = ref({ text: '', image_path: '' })
-const contact = ref({ title: '', description: '', instagram_url: '', linkedin_url: '', email: '', whatsapp_url: '' })
+const contact = ref({
+    title: '',
+    description: '',
+    instagram_url: '',
+    linkedin_url: '',
+    email: '',
+    whatsapp_number: '',
+    whatsapp_message: '',
+})
 const footer = ref({ brand_name: '', brand_subtitle: '', email: '', phone: '', city: '', instagram_url: '', linkedin_url: '', copyright: '', cau: '' })
 const process = ref({ title: '', steps: [] as Array<{ title: string; description: string }> })
 const experience = ref({ title: '', subtitle: '', blocks: [] as Array<{ title: string; items: string[] }> })
 const featuredProjects = ref({ title: '', description: '' })
-const footerServices = ref({ title: 'Serviços', items: [] as string[] })
+const footerServices = ref({ title: 'ServiÃ§os', items: [] as string[] })
 const seo = ref({ title: '', description: '' })
 
 const activeSection = ref<'hero' | 'navbar' | 'about' | 'contact' | 'footer' | 'process' | 'experience' | 'featured' | 'footerServices' | 'seo'>('hero')
 const previewTheme = ref<'light' | 'dark'>('light')
 const sectionLabels: Record<typeof activeSection.value, string> = {
     hero: 'Banner Principal',
-    navbar: 'Navegação',
+    navbar: 'NavegaÃ§Ã£o',
     featured: 'Projetos Destaque',
     about: 'Sobre',
     process: 'Processo',
-    experience: 'Experiência',
+    experience: 'ExperiÃªncia',
     contact: 'Contato',
-    footer: 'Rodapé',
-    footerServices: 'Serviços no rodapé',
-    seo: 'Título da aba',
+    footer: 'RodapÃ©',
+    footerServices: 'ServiÃ§os no rodapÃ©',
+    seo: 'TÃ­tulo da aba',
 }
 
 const load = async () => {
@@ -65,7 +75,7 @@ const load = async () => {
         if (map.featured_projects && typeof map.featured_projects === 'object') Object.assign(featuredProjects.value, map.featured_projects)
         if (map.footer_services && typeof map.footer_services === 'object') {
             const footerServicesValue = map.footer_services as { title?: string; items?: string[] }
-            footerServices.value.title = footerServicesValue.title ?? 'Serviços'
+            footerServices.value.title = footerServicesValue.title ?? 'ServiÃ§os'
             footerServices.value.items = footerServicesValue.items ?? []
         }
         if (map.seo && typeof map.seo === 'object') Object.assign(seo.value, map.seo)
@@ -154,7 +164,7 @@ onMounted(load)
 </script>
 
 <template>
-    <div v-if="isLoading" class="loading">Carregando configurações...</div>
+    <div v-if="isLoading" class="loading">Carregando configuraÃ§Ãµes...</div>
 
     <div v-else class="settings-editor">
         <nav class="section-nav">
@@ -167,13 +177,13 @@ onMounted(load)
         <!-- Hero -->
         <form v-if="activeSection === 'hero'" class="section-form" @submit.prevent="save('hero', hero)">
             <h2>Banner Principal</h2>
-            <p class="section-help">Este conteúdo aparece no topo da página inicial.</p>
+            <p class="section-help">Este conteÃºdo aparece no topo da pÃ¡gina inicial.</p>
             <div class="field">
-                <label>Título</label>
+                <label>TÃ­tulo</label>
                 <input v-model="hero.title" />
             </div>
             <div class="field">
-                <label>Subtítulo</label>
+                <label>SubtÃ­tulo</label>
                 <input v-model="hero.subtitle" />
             </div>
             <div class="field">
@@ -192,8 +202,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><SunIcon aria-hidden="true" /><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><MoonIcon aria-hidden="true" /><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -206,31 +216,31 @@ onMounted(load)
 
         <!-- Navbar -->
         <form v-else-if="activeSection === 'navbar'" class="section-form" @submit.prevent="save('navbar', navbar)">
-            <h2>Navegação</h2>
-            <p class="section-help">Customize marca e rótulos do menu principal.</p>
+            <h2>NavegaÃ§Ã£o</h2>
+            <p class="section-help">Customize marca e rÃ³tulos do menu principal.</p>
             <div class="form-grid">
                 <div class="field"><label>Nome da marca</label><input v-model="navbar.brand_name" /></div>
-                <div class="field"><label>Subtítulo da marca</label><input v-model="navbar.brand_role" /></div>
-                <div class="field"><label>Rótulo Home</label><input v-model="navbar.home_label" /></div>
-                <div class="field"><label>Rótulo Projetos</label><input v-model="navbar.projects_label" /></div>
-                <div class="field"><label>Rótulo Sobre</label><input v-model="navbar.about_label" /></div>
-                <div class="field"><label>Rótulo Contato</label><input v-model="navbar.contact_label" /></div>
+                <div class="field"><label>SubtÃ­tulo da marca</label><input v-model="navbar.brand_role" /></div>
+                <div class="field"><label>RÃ³tulo Home</label><input v-model="navbar.home_label" /></div>
+                <div class="field"><label>RÃ³tulo Projetos</label><input v-model="navbar.projects_label" /></div>
+                <div class="field"><label>RÃ³tulo Sobre</label><input v-model="navbar.about_label" /></div>
+                <div class="field"><label>RÃ³tulo Contato</label><input v-model="navbar.contact_label" /></div>
             </div>
-            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Navegação</button>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar NavegaÃ§Ã£o</button>
         </form>
 
         <!-- Featured Projects -->
         <form v-else-if="activeSection === 'featured'" class="section-form"
             @submit.prevent="save('featured_projects', featuredProjects)">
             <h2>Projetos em Destaque</h2>
-            <p class="section-help">Defina título e descrição da seção exibida na home.</p>
+            <p class="section-help">Defina tÃ­tulo e descriÃ§Ã£o da seÃ§Ã£o exibida na home.</p>
             <div class="field">
-                <label>Título</label>
+                <label>TÃ­tulo</label>
                 <input v-model="featuredProjects.title" />
             </div>
             <div class="field">
-                <label>Descrição</label>
-                <textarea v-model="featuredProjects.description" rows="3"></textarea>
+                <label>DescriÃ§Ã£o</label>
+                <RichTextEditor v-model="featuredProjects.description" min-height="140px" />
             </div>
             <button type="submit" class="btn-save" :disabled="isSaving">Salvar Projetos Destaque</button>
 
@@ -238,8 +248,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><SunIcon aria-hidden="true" /><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><MoonIcon aria-hidden="true" /><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -255,7 +265,7 @@ onMounted(load)
             <h2>Sobre</h2>
             <div class="field">
                 <label>Texto</label>
-                <textarea v-model="about.text" rows="4"></textarea>
+                <RichTextEditor v-model="about.text" min-height="200px" />
             </div>
             <div class="field">
                 <label>Imagem</label>
@@ -273,8 +283,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><SunIcon aria-hidden="true" /><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><MoonIcon aria-hidden="true" /><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -290,15 +300,15 @@ onMounted(load)
             @submit.prevent="save('process', process)">
             <h2>Processo</h2>
             <div class="field">
-                <label>Título da seção</label>
+                <label>TÃ­tulo da seÃ§Ã£o</label>
                 <input v-model="process.title" />
             </div>
             <div class="repeater">
                 <h3>Etapas</h3>
                 <div v-for="(step, i) in process.steps" :key="i" class="repeater-item">
-                    <input v-model="step.title" placeholder="Título da etapa" />
-                    <input v-model="step.description" placeholder="Descrição" />
-                    <button type="button" class="btn-remove" @click="removeStep(i)">×</button>
+                    <input v-model="step.title" placeholder="TÃ­tulo da etapa" />
+                    <input v-model="step.description" placeholder="DescriÃ§Ã£o" />
+                    <button type="button" class="btn-remove" @click="removeStep(i)">Ã—</button>
                 </div>
                 <button type="button" class="btn-add" @click="addStep">+ Adicionar etapa</button>
             </div>
@@ -308,8 +318,8 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><SunIcon aria-hidden="true" /><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><MoonIcon aria-hidden="true" /><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -323,38 +333,38 @@ onMounted(load)
         <!-- Experience -->
         <form v-else-if="activeSection === 'experience'" class="section-form"
             @submit.prevent="save('experience', experience)">
-            <h2>Experiência / Atuação</h2>
+            <h2>ExperiÃªncia / AtuaÃ§Ã£o</h2>
             <div class="field">
-                <label>Título</label>
+                <label>TÃ­tulo</label>
                 <input v-model="experience.title" />
             </div>
             <div class="field">
-                <label>Subtítulo</label>
+                <label>SubtÃ­tulo</label>
                 <input v-model="experience.subtitle" />
             </div>
             <div class="repeater">
                 <h3>Blocos</h3>
                 <div v-for="(block, i) in experience.blocks" :key="i" class="repeater-block">
                     <div class="block-header">
-                        <input v-model="block.title" placeholder="Título do bloco" />
-                        <button type="button" class="btn-remove" @click="removeBlock(i)">×</button>
+                        <input v-model="block.title" placeholder="TÃ­tulo do bloco" />
+                        <button type="button" class="btn-remove" @click="removeBlock(i)">Ã—</button>
                     </div>
                     <div v-for="(_, j) in block.items" :key="j" class="block-item">
                         <input v-model="block.items[j]" placeholder="Item" />
-                        <button type="button" class="btn-remove-sm" @click="removeBlockItem(block, j)">×</button>
+                        <button type="button" class="btn-remove-sm" @click="removeBlockItem(block, j)">Ã—</button>
                     </div>
                     <button type="button" class="btn-add-sm" @click="addBlockItem(block)">+ Item</button>
                 </div>
                 <button type="button" class="btn-add" @click="addBlock">+ Adicionar bloco</button>
             </div>
-            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Experiência</button>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar ExperiÃªncia</button>
 
             <div class="live-preview">
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><SunIcon aria-hidden="true" /><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><MoonIcon aria-hidden="true" /><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -371,10 +381,11 @@ onMounted(load)
             @submit.prevent="save('contact', contact)">
             <h2>Contato</h2>
             <div class="form-grid">
-                <div class="field"><label>Título</label><input v-model="contact.title" /></div>
-                <div class="field"><label>Descrição</label><input v-model="contact.description" /></div>
+                <div class="field"><label>TÃ­tulo</label><input v-model="contact.title" /></div>
+                <div class="field"><label>DescriÃ§Ã£o</label><input v-model="contact.description" /></div>
                 <div class="field"><label>Email</label><input v-model="contact.email" type="email" /></div>
-                <div class="field"><label>WhatsApp URL</label><input v-model="contact.whatsapp_url" /></div>
+                <div class="field"><label>NÃºmero WhatsApp</label><input v-model="contact.whatsapp_number" placeholder="Ex.: 5551999999999" /></div>
+                <div class="field"><label>Mensagem WhatsApp</label><input v-model="contact.whatsapp_message" placeholder="OlÃ¡! Gostaria de falar sobre um projeto." /></div>
                 <div class="field"><label>Instagram URL</label><input v-model="contact.instagram_url" /></div>
                 <div class="field"><label>LinkedIn URL</label><input v-model="contact.linkedin_url" /></div>
             </div>
@@ -384,15 +395,17 @@ onMounted(load)
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><SunIcon aria-hidden="true" /><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><MoonIcon aria-hidden="true" /><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
                     <div class="site-preview" :class="{ 'preview-dark': previewTheme === 'dark' }">
                         <ContactSection :title="contact.title || undefined" :description="contact.description || undefined"
                             :instagram-url="contact.instagram_url || undefined" :linkedin-url="contact.linkedin_url || undefined"
-                            :email="contact.email || undefined" :whatsapp-url="contact.whatsapp_url || undefined" />
+                            :email="contact.email || undefined"
+                            :whatsapp-number="contact.whatsapp_number || undefined"
+                            :whatsapp-message="contact.whatsapp_message || undefined" />
                     </div>
                 </div>
             </div>
@@ -400,10 +413,10 @@ onMounted(load)
 
         <!-- Footer -->
         <form v-else-if="activeSection === 'footer'" class="section-form" @submit.prevent="save('footer', footer)">
-            <h2>Rodapé</h2>
+            <h2>RodapÃ©</h2>
             <div class="form-grid">
                 <div class="field"><label>Nome</label><input v-model="footer.brand_name" /></div>
-                <div class="field"><label>Subtítulo</label><input v-model="footer.brand_subtitle" /></div>
+                <div class="field"><label>SubtÃ­tulo</label><input v-model="footer.brand_subtitle" /></div>
                 <div class="field"><label>Email</label><input v-model="footer.email" type="email" /></div>
                 <div class="field"><label>Telefone</label><input v-model="footer.phone" /></div>
                 <div class="field"><label>Cidade</label><input v-model="footer.city" /></div>
@@ -412,14 +425,14 @@ onMounted(load)
                 <div class="field"><label>Copyright</label><input v-model="footer.copyright" /></div>
                 <div class="field"><label>CAU</label><input v-model="footer.cau" /></div>
             </div>
-            <button type="submit" class="btn-save" :disabled="isSaving">Salvar rodapé</button>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar rodapÃ©</button>
 
             <div class="live-preview">
                 <div class="preview-header">
                     <h3>Preview</h3>
                     <div class="theme-switch" role="group" aria-label="Tema do preview">
-                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><span aria-hidden="true">&#9728;</span><span class="sr-only">Modo claro</span></button>
-                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><span aria-hidden="true">&#9790;</span><span class="sr-only">Modo escuro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'light' }" @click="previewTheme = 'light'"><SunIcon aria-hidden="true" /><span class="sr-only">Modo claro</span></button>
+                        <button type="button" :class="{ active: previewTheme === 'dark' }" @click="previewTheme = 'dark'"><MoonIcon aria-hidden="true" /><span class="sr-only">Modo escuro</span></button>
                     </div>
                 </div>
                 <div class="site-preview-shell">
@@ -437,39 +450,39 @@ onMounted(load)
         <!-- Footer Services -->
         <form v-else-if="activeSection === 'footerServices'" class="section-form"
             @submit.prevent="save('footer_services', footerServices)">
-            <h2>Serviços no Rodapé</h2>
-            <p class="section-help">Personalize o título e a lista de serviços mostrados no rodapé.</p>
+            <h2>ServiÃ§os no RodapÃ©</h2>
+            <p class="section-help">Personalize o tÃ­tulo e a lista de serviÃ§os mostrados no rodapÃ©.</p>
 
             <div class="field">
-                <label>Título da seção</label>
+                <label>TÃ­tulo da seÃ§Ã£o</label>
                 <input v-model="footerServices.title" />
             </div>
 
             <div class="repeater">
                 <h3>Itens</h3>
                 <div v-for="(_, i) in footerServices.items" :key="i" class="repeater-item">
-                    <input v-model="footerServices.items[i]" placeholder="Nome do serviço" />
-                    <button type="button" class="btn-remove" @click="removeFooterService(i)">×</button>
+                    <input v-model="footerServices.items[i]" placeholder="Nome do serviÃ§o" />
+                    <button type="button" class="btn-remove" @click="removeFooterService(i)">Ã—</button>
                 </div>
-                <button type="button" class="btn-add" @click="addFooterService">+ Adicionar serviço</button>
+                <button type="button" class="btn-add" @click="addFooterService">+ Adicionar serviÃ§o</button>
             </div>
 
-            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Serviços do Rodapé</button>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar ServiÃ§os do RodapÃ©</button>
         </form>
 
         <!-- SEO -->
         <form v-else class="section-form" @submit.prevent="save('seo', seo)">
-            <h2>Título da aba e Google</h2>
+            <h2>TÃ­tulo da aba e Google</h2>
             <p class="section-help">Preencha como seu site deve aparecer na aba do navegador e em resultados de busca.</p>
             <div class="field">
-                <label>Nome do site (título)</label>
+                <label>Nome do site (tÃ­tulo)</label>
                 <input v-model="seo.title" maxlength="255" />
             </div>
             <div class="field">
-                <label>Descrição curta do site</label>
+                <label>DescriÃ§Ã£o curta do site</label>
                 <textarea v-model="seo.description" rows="3" maxlength="320"></textarea>
             </div>
-            <button type="submit" class="btn-save" :disabled="isSaving">Salvar Título e Descrição</button>
+            <button type="submit" class="btn-save" :disabled="isSaving">Salvar TÃ­tulo e DescriÃ§Ã£o</button>
         </form>
     </div>
 </template>
@@ -602,26 +615,42 @@ onMounted(load)
 
 .theme-switch {
     display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem;
     border: 1px solid color-mix(in srgb, var(--contrast-brown) 30%, transparent);
     border-radius: 999px;
-    overflow: hidden;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
 }
 
 .theme-switch button {
-    border: none;
+    border: 1px solid transparent;
     background: transparent;
     color: var(--contrast-brown);
-    font-size: 0.95rem;
-    line-height: 1;
-    min-width: 2.1rem;
-    padding: 0.38rem 0.5rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    padding: 0;
     cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+
+.theme-switch button:hover {
+    transform: translateY(-1px);
+    background: color-mix(in srgb, var(--surface-elevated) 84%, transparent);
 }
 
 .theme-switch button.active {
-    background: var(--contrast-gold);
+    background: color-mix(in srgb, var(--contrast-gold) 26%, transparent);
+    border-color: color-mix(in srgb, var(--contrast-gold) 58%, transparent);
     color: var(--primary-text);
-    font-weight: 700;
+}
+
+.theme-switch button svg {
+    width: 1rem;
+    height: 1rem;
 }
 
 .sr-only {
@@ -662,6 +691,8 @@ onMounted(load)
     scrollbar-width: thin;
     scrollbar-color: color-mix(in srgb, var(--contrast-brown) 65%, transparent)
         color-mix(in srgb, var(--background) 88%, black 12%);
+
+    transition: background-color 0.34s ease, color 0.34s ease, border-color 0.34s ease;
 }
 
 .site-preview.preview-dark {
@@ -672,6 +703,23 @@ onMounted(load)
     --accent: #5A6978;
     --hero-text: #ffffff;
     --hero-overlay: rgba(0, 0, 0, 0.65);
+}
+
+.site-preview.preview-dark,
+.site-preview:not(.preview-dark) {
+    animation: preview-theme-fade 0.36s ease-out;
+}
+
+@keyframes preview-theme-fade {
+    0% {
+        opacity: 0.82;
+        transform: scale(0.995);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .site-preview :deep(.hero) {
@@ -837,5 +885,6 @@ onMounted(load)
     }
 }
 </style>
+
 
 

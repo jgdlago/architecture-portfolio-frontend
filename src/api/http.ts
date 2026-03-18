@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+const TOKEN_KEY = 'portfolio_token'
+
 export const http = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true,
@@ -10,6 +12,20 @@ const bootToken = localStorage.getItem('portfolio_token')
 if (bootToken) {
     http.defaults.headers.common.Authorization = `Bearer ${bootToken}`
 }
+
+http.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const status = error?.response?.status
+
+        if (status === 401) {
+            localStorage.removeItem(TOKEN_KEY)
+            delete http.defaults.headers.common.Authorization
+        }
+
+        return Promise.reject(error)
+    },
+)
 
 export function resolveMediaUrl(path: string | null | undefined): string {
     if (!path) {

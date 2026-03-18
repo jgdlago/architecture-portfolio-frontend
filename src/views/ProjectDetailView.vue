@@ -2,7 +2,17 @@
 import Footer from '@/components/layout/Footer.vue'
 import Navbar from '@/components/layout/Navbar.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
-import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { applySeo } from '@/composables/useSeo'
+import { useToast } from '@/composables/useToast'
+import {
+    ArrowLeftIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    PauseIcon,
+    PlayIcon,
+    ShareIcon,
+    XMarkIcon,
+} from '@heroicons/vue/24/outline'
 import axios from 'axios'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
@@ -16,10 +26,21 @@ const loadError = ref(false)
 
 const slug = computed(() => String(route.params.slug || ''))
 const { observe } = useScrollReveal()
+const toast = useToast()
 
 // Lightbox state
 const lightboxOpen = ref(false)
 const lightboxIndex = ref(0)
+const lightboxZoom = ref(1)
+const lightboxOffset = ref({ x: 0, y: 0 })
+const draggingImage = ref(false)
+const autoplayEnabled = ref(false)
+const transitionSlug = ref<string | null>(null)
+let autoplayTimer: ReturnType<typeof setInterval> | null = null
+const pointers = new Map<number, { x: number; y: number }>()
+const panStart = { x: 0, y: 0 }
+let initialPinchDistance: number | null = null
+let pinchStartZoom = 1
 
 const allImages = computed(() => {
   if (!project.value) return []
@@ -48,10 +69,13 @@ const lightboxImage = computed(() => allImages.value[lightboxIndex.value])
 function openLightbox(index: number) {
   lightboxIndex.value = index
   lightboxOpen.value = true
+  resetZoom()
 }
 
 function closeLightbox() {
   lightboxOpen.value = false
+  stopAutoplay()
+  resetZoom()
 }
 
 function lightboxPrev() {
@@ -60,6 +84,146 @@ function lightboxPrev() {
 
 function lightboxNext() {
   lightboxIndex.value = (lightboxIndex.value + 1) % allImages.value.length
+}
+
+function resetZoom() {
+  lightboxZoom.value = 1
+  lightboxOffset.value = { x: 0, y: 0 }
+}
+
+const imageTransform = computed(() => {
+  return `translate(${lightboxOffset.value.x}px, ${lightboxOffset.value.y}px) scale(${lightboxZoom.value})`
+})
+
+const heroTransitionName = computed(() => {
+  if (!project.value || transitionSlug.value !== project.value.slug) {
+    return 'none'
+  }
+
+  return `project-cover-${project.value.slug}`
+})
+
+function onLightboxWheel(event: WheelEvent) {
+  if (!lightboxOpen.value) {
+    return
+  }
+
+  event.preventDefault()
+  const nextZoom = lightboxZoom.value + (event.deltaY < 0 ? 0.12 : -0.12)
+  lightboxZoom.value = Math.min(3, Math.max(1, nextZoom))
+
+  if (lightboxZoom.value === 1) {
+    lightboxOffset.value = { x: 0, y: 0 }
+  }
+}
+
+function onPointerDown(event: PointerEvent) {
+  if (!lightboxOpen.value) {
+    return
+  }
+
+  ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+  pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+
+  if (pointers.size === 1 && lightboxZoom.value > 1) {
+    draggingImage.value = true
+    panStart.x = event.clientX - lightboxOffset.value.x
+    panStart.y = event.clientY - lightboxOffset.value.y
+  }
+
+  if (pointers.size === 2) {
+    const pair = [...pointers.values()]
+    initialPinchDistance = Math.hypot(pair[0]!.x - pair[1]!.x, pair[0]!.y - pair[1]!.y)
+    pinchStartZoom = lightboxZoom.value
+  }
+}
+
+function onPointerMove(event: PointerEvent) {
+  if (!pointers.has(event.pointerId)) {
+    return
+  }
+
+  pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+
+  if (pointers.size === 2 && initialPinchDistance) {
+    const pair = [...pointers.values()]
+    const distance = Math.hypot(pair[0]!.x - pair[1]!.x, pair[0]!.y - pair[1]!.y)
+    const nextZoom = pinchStartZoom * (distance / initialPinchDistance)
+    lightboxZoom.value = Math.min(3, Math.max(1, nextZoom))
+
+    if (lightboxZoom.value === 1) {
+      lightboxOffset.value = { x: 0, y: 0 }
+    }
+    return
+  }
+
+  if (draggingImage.value && lightboxZoom.value > 1) {
+    lightboxOffset.value = {
+      x: event.clientX - panStart.x,
+      y: event.clientY - panStart.y,
+    }
+  }
+}
+
+function onPointerUp(event: PointerEvent) {
+  pointers.delete(event.pointerId)
+
+  if (pointers.size < 2) {
+    initialPinchDistance = null
+  }
+
+  if (pointers.size === 0) {
+    draggingImage.value = false
+  }
+}
+
+function startAutoplay() {
+  stopAutoplay()
+  autoplayEnabled.value = true
+  autoplayTimer = setInterval(() => {
+    lightboxNext()
+  }, 3000)
+}
+
+function stopAutoplay() {
+  autoplayEnabled.value = false
+  if (autoplayTimer) {
+    clearInterval(autoplayTimer)
+    autoplayTimer = null
+  }
+}
+
+function toggleAutoplay() {
+  if (autoplayEnabled.value) {
+    stopAutoplay()
+    return
+  }
+
+  startAutoplay()
+}
+
+async function shareCurrentImage() {
+  if (!project.value) {
+    return
+  }
+
+  const url = `${window.location.origin}/projects/${project.value.slug}?image=${lightboxIndex.value + 1}`
+
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: project.value.title,
+        text: `Confira este projeto: ${project.value.title}`,
+        url,
+      })
+      return
+    }
+
+    await navigator.clipboard.writeText(url)
+    toast.success('Link da imagem copiado para a área de transferência.')
+  } catch {
+    toast.error('Não foi possível compartilhar esta imagem agora.')
+  }
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -76,9 +240,30 @@ const additionalInfoEntries = computed(() => {
 
 onMounted(async () => {
   document.addEventListener('keydown', onKeydown)
+  transitionSlug.value = sessionStorage.getItem('portfolio-transition-project')
+  sessionStorage.removeItem('portfolio-transition-project')
+
+  const queryImage = Number(route.query.image ?? 0)
   try {
     project.value = await fetchProjectBySlug(slug.value)
     loadError.value = false
+
+    if (project.value) {
+      const seoDescription = project.value.short_description
+        || project.value.description
+        || `Conheça o projeto ${project.value.title}.`
+
+      applySeo({
+        title: `${project.value.title} | Projetos`,
+        description: seoDescription,
+        image: resolveMediaUrl(project.value.cover_image_path),
+        path: `/projects/${project.value.slug}`,
+      })
+    }
+
+    if (project.value && queryImage > 0 && queryImage <= allImages.value.length) {
+      openLightbox(queryImage - 1)
+    }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       project.value = null
@@ -101,8 +286,16 @@ watch(
   },
 )
 
+watch(
+  () => lightboxIndex.value,
+  () => {
+    resetZoom()
+  },
+)
+
 onUnmounted(() => {
   document.removeEventListener('keydown', onKeydown)
+  stopAutoplay()
 })
 </script>
 
@@ -127,7 +320,14 @@ onUnmounted(() => {
       </div>
 
       <div v-if="allImages.length" class="hero-image reveal-fade" @click="openLightbox(0)">
-        <img :src="resolveMediaUrl(allImages[0]!.image_path)" :alt="allImages[0]!.alt_text || project.title" />
+        <img
+          :src="resolveMediaUrl(allImages[0]!.image_path)"
+          :alt="allImages[0]!.alt_text || project.title"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          :style="{ viewTransitionName: heroTransitionName }"
+        />
       </div>
 
       <div class="content-grid container">
@@ -137,7 +337,7 @@ onUnmounted(() => {
             <h1>{{ project.title }}</h1>
           </header>
 
-          <p v-if="project.description" class="description">{{ project.description }}</p>
+          <div v-if="project.description" class="description" v-html="project.description" />
           <p v-else-if="project.short_description" class="description">{{ project.short_description }}</p>
         </div>
 
@@ -179,6 +379,8 @@ onUnmounted(() => {
             <img
               :src="resolveMediaUrl(image.image_path)"
               :alt="image.alt_text || project.title"
+              loading="lazy"
+              decoding="async"
             />
           </button>
         </div>
@@ -192,6 +394,16 @@ onUnmounted(() => {
               <XMarkIcon />
             </button>
 
+            <div class="lb-tools">
+              <button class="lb-tool" @click="shareCurrentImage" aria-label="Compartilhar imagem">
+                <ShareIcon />
+              </button>
+              <button class="lb-tool" @click="toggleAutoplay" :aria-label="autoplayEnabled ? 'Pausar slideshow' : 'Iniciar slideshow'">
+                <PauseIcon v-if="autoplayEnabled" />
+                <PlayIcon v-else />
+              </button>
+            </div>
+
             <button v-if="allImages.length > 1" class="lb-nav lb-prev" @click="lightboxPrev" aria-label="Anterior">
               <ChevronLeftIcon />
             </button>
@@ -200,6 +412,12 @@ onUnmounted(() => {
               :src="resolveMediaUrl(lightboxImage.image_path)"
               :alt="lightboxImage.alt_text || project?.title"
               class="lb-image"
+              :style="{ transform: imageTransform }"
+              @wheel="onLightboxWheel"
+              @pointerdown="onPointerDown"
+              @pointermove="onPointerMove"
+              @pointerup="onPointerUp"
+              @pointercancel="onPointerUp"
             />
 
             <button v-if="allImages.length > 1" class="lb-nav lb-next" @click="lightboxNext" aria-label="Próxima">
@@ -208,6 +426,18 @@ onUnmounted(() => {
 
             <div v-if="lightboxImage.caption" class="lb-caption">{{ lightboxImage.caption }}</div>
             <div class="lb-counter">{{ lightboxIndex + 1 }} / {{ allImages.length }}</div>
+
+            <div v-if="allImages.length > 1" class="lb-thumbs" role="listbox" aria-label="Miniaturas da galeria">
+              <button
+                v-for="(image, idx) in allImages"
+                :key="`thumb-${image.id}-${idx}`"
+                class="lb-thumb"
+                :class="{ active: idx === lightboxIndex }"
+                @click="lightboxIndex = idx"
+              >
+                <img :src="resolveMediaUrl(image.image_path)" :alt="image.alt_text || project?.title" loading="lazy" decoding="async" />
+              </button>
+            </div>
           </div>
         </Transition>
       </Teleport>
@@ -317,6 +547,21 @@ onUnmounted(() => {
   font-size: 1rem;
   line-height: 1.85;
   color: var(--contrast-brown);
+}
+
+.description :deep(p) {
+  margin: 0.7rem 0;
+}
+
+.description :deep(h2),
+.description :deep(h3) {
+  margin: 1.1rem 0 0.35rem;
+  color: var(--primary-text);
+}
+
+.description :deep(ul) {
+  margin: 0.55rem 0;
+  padding-left: 1.35rem;
 }
 
 .content-meta dl {
@@ -450,6 +695,38 @@ onUnmounted(() => {
   max-height: 85vh;
   object-fit: contain;
   border-radius: var(--radius-sm);
+  touch-action: none;
+  transition: transform 0.18s ease;
+  cursor: grab;
+}
+
+.lb-image:active {
+  cursor: grabbing;
+}
+
+.lb-tools {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.lb-tool {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  border-radius: 999px;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.lb-tool svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 .lb-caption {
@@ -465,12 +742,46 @@ onUnmounted(() => {
 
 .lb-counter {
   position: absolute;
-  bottom: 1.5rem;
+  bottom: 5.7rem;
   left: 50%;
   transform: translateX(-50%);
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.75rem;
   letter-spacing: 0.1em;
+}
+
+.lb-thumbs {
+  position: absolute;
+  bottom: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92vw, 760px);
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding: 0.35rem 0.1rem;
+}
+
+.lb-thumb {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  width: 78px;
+  height: 56px;
+  flex: 0 0 auto;
+  padding: 0;
+  cursor: pointer;
+}
+
+.lb-thumb.active {
+  border-color: color-mix(in srgb, var(--contrast-gold) 84%, white 16%);
+}
+
+.lb-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .lightbox-fade-enter-active,
@@ -501,6 +812,16 @@ onUnmounted(() => {
 
   .lb-nav {
     padding: 0.5rem;
+  }
+
+  .lb-tools {
+    top: 0.85rem;
+    left: 0.85rem;
+  }
+
+  .lb-thumb {
+    width: 66px;
+    height: 48px;
   }
 
   .lb-nav svg {
