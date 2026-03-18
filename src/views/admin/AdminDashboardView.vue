@@ -118,6 +118,8 @@ const selectTab = (tab: typeof activeTab.value) => {
 
 .mobile-trigger {
     display: none;
+    align-self: start;
+    justify-self: start;
 }
 
 .sidebar {
@@ -284,13 +286,20 @@ const selectTab = (tab: typeof activeTab.value) => {
     .mobile-trigger {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 0.4rem;
         border: 1px solid var(--border);
         border-radius: 999px;
         background: color-mix(in srgb, var(--surface) 95%, transparent);
         padding: 0.45rem 0.85rem;
         color: var(--primary-text);
-        width: fit-content;
+        width: auto;
+        min-height: 2.25rem;
+        max-height: 2.25rem;
+        white-space: nowrap;
+        flex: 0 0 auto;
+        align-self: start;
+        justify-self: start;
         cursor: pointer;
     }
 
