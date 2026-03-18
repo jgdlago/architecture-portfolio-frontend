@@ -368,7 +368,30 @@ onMounted(async () => {
 
 @media (max-width: 640px) {
   .projects-page {
-    padding: var(--space-12) 0 var(--space-10);
+    padding: var(--space-10) 0 var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .page-header h1 {
+    font-size: clamp(1.95rem, 8vw, 2.5rem);
+  }
+
+  .filters {
+    margin-bottom: var(--space-6);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: thin;
+  }
+
+  .filters button {
+    flex: 0 0 auto;
+    padding: 0.55rem 1rem;
+    letter-spacing: 0.12em;
+    font-size: 0.7rem;
   }
 
   .loading-grid,
@@ -376,9 +399,47 @@ onMounted(async () => {
     grid-template-columns: 1fr;
   }
 
+  .grid {
+    gap: var(--space-6);
+  }
+
+  .card {
+    border-bottom: 1px solid color-mix(in srgb, var(--contrast-brown) 20%, transparent);
+    padding-bottom: var(--space-6);
+  }
+
   .card-overlay {
-    opacity: 1;
-    padding: var(--space-5);
+    display: none;
+  }
+
+  .card-category {
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    padding: 0.22rem 0.54rem;
+  }
+
+  .card-body {
+    margin-top: 0.8rem;
+  }
+
+  .card-body h3 {
+    font-size: 1.12rem;
+    line-height: 1.15;
+    margin-bottom: 0.45rem;
+  }
+
+  .card-body p {
+    margin-bottom: 0.7rem;
+  }
+
+  .card-meta {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    letter-spacing: 0.14em;
+  }
+
+  .empty {
+    padding: var(--space-6);
   }
 }
 </style>
